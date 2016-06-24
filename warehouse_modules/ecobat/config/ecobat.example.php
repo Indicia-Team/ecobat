@@ -20,25 +20,25 @@
  * @link 	http://code.google.com/p/indicia/
  */
 
-$config['website_id'] = 2;//126;
-$config['survey_id'] = 2;//260;
+$config['website_id'] = 123;
+$config['survey_id'] = 123;
 $config['sample_attrs'] = array(
-  'detector_make_id' => 'smpAttr:765',
-  'detector_make_other' => 'smpAttr:765',
-  'detector_model' => 'smpAttr:763',
-  'detector_height_m' => 'smpAttr:',
-  'roost_within_25m' => 'smpAttr:',
-  'activity_elevated_by_roost' => 'smpAttr:',
-  'linear_feature_adjacent_id' => 'smpAttr:',
-  'linear_feature_25m_id' => 'smpAttr:',
-  'anthropogenic_feature_adjacent_id' => 'smpAttr:',
-  'anthropogenic_feature_25m_id' => 'smpAttr:',
-  'temperature_c' => 'smpAttr:764',
-  'rainfall_id' => 'smpAttr:',
-  'wind_speed' => 'smpAttr:',
-  'wind_speed_unit_id' => 'smpAttr:'
+  'detector_make_id' => 'smpAttr:123',
+  'detector_make_other' => 'smpAttr:123',
+  'detector_model' => 'smpAttr:123',
+  'detector_height_m' => 'smpAttr:123',
+  'roost_within_25m' => 'smpAttr:123',
+  'activity_elevated_by_roost' => 'smpAttr:123',
+  'linear_feature_adjacent_id' => 'smpAttr:123',
+  'linear_feature_25m_id' => 'smpAttr:123',
+  'anthropogenic_feature_adjacent_id' => 'smpAttr:123',
+  'anthropogenic_feature_25m_id integer' => 'smpAttr:123',
+  'temperature_c' => 'smpAttr:123',
+  'rainfall_id' => 'smpAttr:123',
+  'wind_speed' => 'smpAttr:123',
+  'wind_speed_unit_id' => 'smpAttr:123'
 );
 $config['occurrence_attrs'] = array(
-  'passes' => 'occAttr:372',
-  'pass_definition_id' => 'occAttr:373'
+  'passes' => 'occAttr:123',
+  'pass_definition_id' => 'occAttr:123'
 );

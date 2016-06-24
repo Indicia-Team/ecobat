@@ -34,9 +34,14 @@ class Ecobat_occurrence_Model extends ORM {
   protected $belongs_to=array
   (
     'taxa_taxon_list',
-    'roost_taxa_taxon_list'=>'taxa_taxon_list',
     'pass_definition'=>'termlists_term',
-    'habitat'=>'termlists_term',
+    'detector_make'=>'termlists_term',
+    'linear_feature_adjacent'=>'termlists_term',
+    'linear_feature_25m'=>'termlists_term',
+    'anthropogenic_feature_adjacent'=>'termlists_term',
+    'anthropogenic_feature_25m'=>'termlists_term',
+    'rainfall'=>'termlists_term',
+    'wind_speed_unit'=>'termlists_term',
     'group'
   );
 
@@ -47,25 +52,28 @@ class Ecobat_occurrence_Model extends ORM {
     $array->add_rules('taxa_taxon_list_id', 'required');
     $array->add_rules('entered_sref', 'required');
     $array->add_rules('entered_sref_system', 'required');
-    // linear features and roost not required as they have defaults
-    // other validation
-    $array->add_rules('taxa_taxon_list_id', 'integer');
     $array->add_rules('easting', 'integer');
     $array->add_rules('northing', 'integer');
     $array->add_rules('map_sq_10km_id', 'integer');
-    $array->add_rules('sensitivity', 'integer');
-    $array->add_rules('date_start', 'date');
-    $array->add_rules('passes', 'integer');
-    $array->add_rules('pass_definition_id', 'integer');
-    $array->add_rules('min_temperature_c', 'integer');
-    $array->add_rules('precipitation_mm', 'integer');
-    $array->add_rules('wind_speed_mph', 'integer');
-    $array->add_rules('roost_taxa_taxon_list_id', 'integer');
-    $array->add_rules('habitat_id', 'integer');
+    $array->add_rules('sensitivity', 'integer', 'required');
+    $array->add_rules('date_start', 'date', 'required');
+    $array->add_rules('day_of_year', 'integer');
+    $array->add_rules('passes', 'integer', 'required');
+    $array->add_rules('pass_definition_id', 'integer', 'required');
+    $array->add_rules('detector_make_id', 'integer');
+    $array->add_rules('linear_feature_adjacent_id', 'integer');
+    $array->add_rules('linear_feature_25m_id', 'integer');
+    $array->add_rules('anthropogenic_feature_adjacent_id', 'integer');
+    $array->add_rules('anthropogenic_feature_25m_id', 'integer');
+    $array->add_rules('temperature_c', 'maximum[45]');
+    $array->add_rules('rainfall_id', 'integer');
+    $array->add_rules('wind_speed', 'integer');
+    $array->add_rules('wind_speed_unit_id', 'integer');
     $array->add_rules('occurrence_id', 'integer');
-    $this->unvalidatedFields = array('external_key', 'geom', 'detector_model',
-        'linear_features', 'roost', 'feature_type', 'roost_external_key');
-
+    $array->add_rules('group_id', 'integer');
+    $this->unvalidatedFields = array('external_key', 'geom', 'detector_make_other',
+      'detector_model', 'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
+      'roost_species', 'notes', 'upload_guid');
     return parent::validate($array, $save);
   }
 
@@ -109,15 +117,6 @@ class Ecobat_occurrence_Model extends ORM {
         'linked_filter_field' => 'website_id',
         'filterIncludesNulls' => TRUE
       ),
-      'ecobat_occurrence:fkFilter:roost_taxa_taxon_list:taxon_list_id' => array(
-        'display' => 'Roost species list',
-        'description' => 'Select the species checklist which will be used when attempting to match roost species names.',
-        'datatype' => 'lookup',
-        'population_call' => 'direct:taxon_list:id:title',
-        'linked_to' => 'website_id',
-        'linked_filter_field' => 'website_id',
-        'filterIncludesNulls' => TRUE
-      ),
       'ecobat_occurrence:pass_definition_id' => array(
         'display' => 'Pass definition',
         'description' => 'Select the definition used as a criteria for the number of passes.',
@@ -125,21 +124,18 @@ class Ecobat_occurrence_Model extends ORM {
         'population_call' => 'report:library/terms/terms_list:termlists_term_id:term:termlist_external_key=ecobat:pass_definitions,termlist_id='
       ),
       'ecobat_occurrence:sensitivity' => array(
-        'display' => 'Choose the grid square size to blur records when publishing the records.',
+        'display' => 'Choose the sensitivity settings for the records.',
         'description' => '',
         'datatype' => 'lookup',
-        'lookup_values' => '100:100m,1000:1km,2000:2km,10000:10km,100000:100km,:Do not publish',
+        'lookup_values' => '1:Public,2:Blur records to 10km grid square,3:Do not publish',
         'default'=>'100'
       ),
-      'ecobat_occurrence:fkFilter:habitat:termlist_id' => array(
-        'display' => 'Habitat classification',
-        'description' => 'Select the habitat classification to use for the habitat lookup.',
+      'ecobat_occurrence:wind_speed_unit_id' => array(
+        'display' => 'Wind speed unit',
+        'description' => 'Select the unit used for the wind speed.',
         'datatype' => 'lookup',
-        'population_call' => 'direct:termlist:id:title',
-        'linked_to' => 'website_id',
-        'linked_filter_field' => 'website_id',
-        'filterIncludesNulls' => TRUE
-      )
+        'population_call' => 'report:library/terms/terms_list:termlists_term_id:term:termlist_external_key=ecobat:wind_speed_units,termlist_id='
+      ),
     );
     return $retVal;
   }
@@ -147,10 +143,13 @@ class Ecobat_occurrence_Model extends ORM {
   /**
    * Before submission:
    * * fill in the geom field using the supplied spatial reference, if not already filled in
+   * * fill in the day of year which is used for quick date filtering
    */
   protected function preSubmit()
   {
     $this->preSubmitFillInGeom();
+    $this->preSubmitFillInDayOfYear();
+    $this->preSubmitFillInSensitivity();
     return parent::presubmit();
   }
 
@@ -176,14 +175,31 @@ class Ecobat_occurrence_Model extends ORM {
     }
   }
 
+  private function preSubmitFillInDayOfYear() {
+    if (array_key_exists('date_start', $this->submission['fields']) &&
+        !empty($this->submission['fields']['date_start']['value'])) {
+      $date = $this->submission['fields']['date_start']['value'];
+      $this->submission['fields']['day_of_year']['value'] = date('z', strtotime($date));
+    }
+  }
+
+  private function preSubmitFillInSensitivity() {
+    $mappings = array('open' => 1, '10kmbuffer'=>2, 'sensitive'=>3);
+    if (array_key_exists('sensitivity', $this->submission['fields']) &&
+        !empty($this->submission['fields']['sensitivity']['value']) &&
+        !empty($mappings[strtolower(str_replace(' ', '', $this->submission['fields']['sensitivity']['value']))])) {
+      $this->submission['fields']['sensitivity']['value'] =
+        $mappings[strtolower(str_replace(' ', '', $this->submission['fields']['sensitivity']['value']))];
+    }
+  }
+
   /**
-   * Override set handler to translate WKT to PostGIS internal spatial data. Also
-   * syncs the easting and northing
+   * Override set handler to translate WKT to PostGIS internal spatial data.
+   * Also sets the easting and northing.
    */
   public function __set($key, $value)
   {
-    if (substr($key,-4) == 'geom')
-    {
+    if ($key === 'geom') {
       if ($value) {
         $geom = "ST_GeomFromText('$value', ".kohana::config('sref_notations.internal_srid').")";
         $row = $this->db->query("SELECT $geom AS geom, " .

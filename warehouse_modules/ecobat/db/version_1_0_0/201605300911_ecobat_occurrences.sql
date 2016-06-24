@@ -2,9 +2,64 @@
 INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
 VALUES ('Ecobat pass definitions', 'Definitions of types of bat pass for Ecobat.', now(), 1, now(), 1, 'ecobat:pass_definitions');
 
-select insert_term('Registration', 'eng', null, 'ecobat:pass_definitions');
-select insert_term('Passes', 'eng', null, 'ecobat:pass_definitions');
-select insert_term('Individual calls/pulses', 'eng', null, 'ecobat:pass_definitions');
+select insert_term('Registration 15s', 'eng', 1, null, 'ecobat:pass_definitions');
+select insert_term('Pass 1s gap', 'eng', 2, null, 'ecobat:pass_definitions');
+select insert_term('Pass 2s gap', 'eng', 3, null, 'ecobat:pass_definitions');
+select insert_term('Pulses', 'eng', 4, null, 'ecobat:pass_definitions');
+select insert_term('Other', 'eng', 5, null, 'ecobat:pass_definitions');
+
+INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
+VALUES ('Ecobat detector manufacturers', 'List of bat detector makes.', now(), 1, now(), 1, 'ecobat:detector_makes');
+
+select insert_term('Batbox', 'eng', 1, null, 'ecobat:detector_makes');
+select insert_term('Ciel', 'eng', 2, null, 'ecobat:detector_makes');
+select insert_term('Courtpan', 'eng', 3, null, 'ecobat:detector_makes');
+select insert_term('Elekon', 'eng', 4, null, 'ecobat:detector_makes');
+select insert_term('Magenta', 'eng', 5, null, 'ecobat:detector_makes');
+select insert_term('Peersonic', 'eng', 6, null, 'ecobat:detector_makes');
+select insert_term('Pettersson', 'eng', 7, null, 'ecobat:detector_makes');
+select insert_term('Titley Scientific', 'eng', 8, null, 'ecobat:detector_makes');
+select insert_term('Wildlife Acoustics', 'eng', 9, null, 'ecobat:detector_makes');
+select insert_term('Other', 'eng', 10, null, 'ecobat:detector_makes');
+
+INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
+VALUES ('Ecobat linear feature', 'List of linear features for Ecobat static detector records.', now(), 1, now(), 1, 'ecobat:linear_features');
+
+select insert_term('None', 'eng', 1, null, 'ecobat:linear_features');
+select insert_term('Ditch', 'eng', 2, null, 'ecobat:linear_features');
+select insert_term('Hedgerow', 'eng', 3, null, 'ecobat:linear_features');
+select insert_term('Running water', 'eng', 4, null, 'ecobat:linear_features');
+select insert_term('Standing water', 'eng', 5, null, 'ecobat:linear_features');
+select insert_term('Treeline', 'eng', 6, null, 'ecobat:linear_features');
+select insert_term('Woodland edge', 'eng', 7, null, 'ecobat:linear_features');
+select insert_term('Other', 'eng', 8, null, 'ecobat:linear_features');
+
+INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
+VALUES ('Ecobat anthropogenic feature', 'List of man-made features for Ecobat static detector records.', now(), 1, now(), 1, 'ecobat:anthropogenic_features');
+
+select insert_term('None', 'eng', 1, null, 'ecobat:anthropogenic_features');
+select insert_term('Building', 'eng', 2, null, 'ecobat:anthropogenic_features');
+select insert_term('Fenceline', 'eng', 3, null, 'ecobat:anthropogenic_features');
+select insert_term('Major road', 'eng', 4, null, 'ecobat:anthropogenic_features');
+select insert_term('Minor road', 'eng', 5, null, 'ecobat:anthropogenic_features');
+select insert_term('Streetlight', 'eng', 6, null, 'ecobat:anthropogenic_features');
+select insert_term('Wind turbine', 'eng', 7, null, 'ecobat:anthropogenic_features');
+select insert_term('Other', 'eng', 8, null, 'ecobat:anthropogenic_features');
+
+INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
+VALUES ('Ecobat rainfall', 'List of rainfall terms.', now(), 1, now(), 1, 'ecobat:rainfall');
+
+select insert_term('Dry', 'eng', 1, null, 'ecobat:rainfall');
+select insert_term('Drizzle', 'eng', 2, null, 'ecobat:rainfall');
+select insert_term('Heavy', 'eng', 3, null, 'ecobat:rainfall');
+select insert_term('Other', 'eng', 4, null, 'ecobat:rainfall');
+
+INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
+VALUES ('Ecobat wind speed units', 'List of units for measuring wind speed.', now(), 1, now(), 1, 'ecobat:wind_speed_units');
+
+select insert_term('Beaufort', 'eng', 1, null, 'ecobat:wind_speed_units');
+select insert_term('Mph', 'eng', 2, null, 'ecobat:wind_speed_units');
+select insert_term('Other', 'eng', 3, null, 'ecobat:wind_speed_units');
 
 CREATE TABLE ecobat_occurrences
 (
@@ -17,26 +72,34 @@ CREATE TABLE ecobat_occurrences
   northing integer, --
   geom geometry(Geometry,900913),
   map_sq_10km_id integer, --
-  sensitivity integer,
+  sensitivity integer NOT NULL default 1,
   date_start date NOT NULL,
+  day_of_year integer NOT NULL,
   passes integer NOT NULL,
   pass_definition_id integer NOT NULL,
-  detector_model character varying,
-  min_temperature_c integer,
-  precipitation_mm integer,
-  wind_speed_mph integer,
-  linear_features boolean NOT NULL DEFAULT FALSE,
-  feature_type character varying,
-  roost boolean NOT NULL DEFAULT FALSE,
-  roost_taxa_taxon_list_id integer,
-  roost_external_key char(16), --
-  habitat_id integer,
+  detector_make_id integer,
+  detector_make_other character varying,
+  detector_model character varying NOT NULL,
+  detector_height_m numeric(4,2),
+  roost_within_25m boolean NOT NULL DEFAULT FALSE,
+  activity_elevated_by_roost boolean NOT NULL DEFAULT FALSE,
+  roost_species character varying,
+  linear_feature_adjacent_id integer NOT NULL,
+  linear_feature_25m_id integer NOT NULL,
+  anthropogenic_feature_adjacent_id integer NOT NULL,
+  anthropogenic_feature_25m_id integer NOT NULL,
+  temperature_c numeric(4,2),
+  rainfall_id integer,
+  wind_speed integer,
+  wind_speed_unit_id integer,
+  notes character varying,
   occurrence_id integer,
   group_id integer,
   created_on timestamp without time zone NOT NULL, -- Date this record was created.
   created_by_id integer NOT NULL, -- Foreign key to the users table (creator).
   updated_on timestamp without time zone NOT NULL, -- Date this record was last updated.
   updated_by_id integer NOT NULL,
+  import_guid character varying,
   CONSTRAINT pk_ecobat_occurrences PRIMARY KEY (id),
   CONSTRAINT fk_ecobat_occurrence_10km_map_square FOREIGN KEY (map_sq_10km_id)
       REFERENCES map_squares (id) MATCH SIMPLE
@@ -44,13 +107,28 @@ CREATE TABLE ecobat_occurrences
   CONSTRAINT fk_ecobat_occurrence_taxon FOREIGN KEY (taxa_taxon_list_id)
       REFERENCES taxa_taxon_lists (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_ecobat_occurrence_roost_taxon FOREIGN KEY (roost_taxa_taxon_list_id)
-      REFERENCES taxa_taxon_lists (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_ecobat_occurrence_pass_definition FOREIGN KEY (pass_definition_id)
       REFERENCES termlists_terms (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_ecobat_occurrence_habitat FOREIGN KEY (habitat_id)
+  CONSTRAINT fk_ecobat_occurrence_detector_make FOREIGN KEY (detector_make_id)
+      REFERENCES termlists_terms (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_ecobat_occurrence_linear_feature_adjacent FOREIGN KEY (linear_feature_adjacent_id)
+      REFERENCES termlists_terms (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_ecobat_occurrence_linear_feature_25m FOREIGN KEY (linear_feature_25m_id)
+      REFERENCES termlists_terms (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_ecobat_occurrence_anthropogenic_feature_adjacent FOREIGN KEY (linear_feature_adjacent_id)
+      REFERENCES termlists_terms (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_ecobat_occurrence_anthropogenic_feature_25m FOREIGN KEY (linear_feature_25m_id)
+      REFERENCES termlists_terms (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_ecobat_occurrence_rainfall_id FOREIGN KEY (rainfall_id)
+      REFERENCES termlists_terms (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_ecobat_occurrence_wind_speed_unit FOREIGN KEY (wind_speed_unit_id)
       REFERENCES termlists_terms (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_ecobat_occurrence_occurrences FOREIGN KEY (occurrence_id)
@@ -60,7 +138,7 @@ CREATE TABLE ecobat_occurrences
       REFERENCES groups (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT chk_ecobat_sensitivity
-      CHECK (sensitivity is null or sensitivity in (100, 1000, 2000, 10000, 100000))
+      CHECK (sensitivity is null or sensitivity in (1, 2, 3))
 )
 WITH (
   OIDS=FALSE
@@ -78,20 +156,25 @@ COMMENT ON COLUMN ecobat_occurrences.easting IS 'OSGB easting for the record.';
 COMMENT ON COLUMN ecobat_occurrences.northing IS 'OSGB northing for the record.';
 COMMENT ON COLUMN ecobat_occurrences.geom IS 'Geometry for the record.';
 COMMENT ON COLUMN ecobat_occurrences.map_sq_10km_id IS 'Foreign key to the map_squares table. Identifies the 10km square the record falls into.';
-COMMENT ON COLUMN ecobat_occurrences.sensitivity IS 'Sensitivity preferences for the record. Null = record withheld from the main occurrences dataset and only used for reference ranges. Otherwise this is the size of the grid square to blur to.';
+COMMENT ON COLUMN ecobat_occurrences.sensitivity IS 'Sensitivity preferences for the record. 1=open, 2=10km blur, 3=open.';
 COMMENT ON COLUMN ecobat_occurrences.date_start IS 'Date at the start of the nights surveying.';
 COMMENT ON COLUMN ecobat_occurrences.passes IS 'Total number of passes during the night for this species.';
 COMMENT ON COLUMN ecobat_occurrences.pass_definition_id IS 'Foreign key to the termlists_terms table. Defines the method used to identify a pass.';
-COMMENT ON COLUMN ecobat_occurrences.detector_model IS 'The make and model of bat detector used.';
-COMMENT ON COLUMN ecobat_occurrences.min_temperature_c IS 'Minimum temperature during the night (degrees centigrade)';
-COMMENT ON COLUMN ecobat_occurrences.precipitation_mm IS 'Total precipitation during the night (mm)';
-COMMENT ON COLUMN ecobat_occurrences.wind_speed_mph IS 'Maximum wind speed (mph)';
-COMMENT ON COLUMN ecobat_occurrences.linear_features IS 'Presence or absence of linear features within 50m';
-COMMENT ON COLUMN ecobat_occurrences.feature_type IS 'Type of linear feature';
-COMMENT ON COLUMN ecobat_occurrences.roost IS 'Presence or absence of a roost within 50m.';
-COMMENT ON COLUMN ecobat_occurrences.roost_taxa_taxon_list_id IS 'Foreign key to the taxa_taxon_lists table. Taxon at the roost.';
-COMMENT ON COLUMN ecobat_occurrences.roost_taxa_taxon_list_id IS 'Foreign key to the taxa_taxon_lists table. Taxon at the roost.';
-COMMENT ON COLUMN ecobat_occurrences.habitat_id IS 'Foreign key to the termlists_terms table. Identifies the Phase 1 habitat.';
+COMMENT ON COLUMN ecobat_occurrences.detector_make_id IS 'The makeof bat detector used, picked from a controlled list.';
+COMMENT ON COLUMN ecobat_occurrences.detector_make_other IS 'The make of bat detector used if not on the list.';
+COMMENT ON COLUMN ecobat_occurrences.detector_model IS 'The model of bat detector used.';
+COMMENT ON COLUMN ecobat_occurrences.detector_height_m IS 'Height of the detector from the ground in metres.';
+COMMENT ON COLUMN ecobat_occurrences.roost_within_25m IS 'Presence or absence of a roost within 25m.';
+COMMENT ON COLUMN ecobat_occurrences.activity_elevated_by_roost IS 'Flag set if activity was elevated because of the presence of a roost.';
+COMMENT ON COLUMN ecobat_occurrences.roost_species IS 'Free text list of species at the roost(s).';
+COMMENT ON COLUMN ecobat_occurrences.linear_feature_adjacent_id IS 'Type of linear feature adjacent to the detector.';
+COMMENT ON COLUMN ecobat_occurrences.linear_feature_25m_id IS 'Type of linear feature within 25m of the detector.';
+COMMENT ON COLUMN ecobat_occurrences.anthropogenic_feature_adjacent_id IS 'Type of anthropogenic feature adjacent to the detector.';
+COMMENT ON COLUMN ecobat_occurrences.anthropogenic_feature_25m_id IS 'Type of anthropogenic feature within 25m of the detector.';
+COMMENT ON COLUMN ecobat_occurrences.temperature_c IS 'Temperature at sunset (degrees centigrade)';
+COMMENT ON COLUMN ecobat_occurrences.rainfall_id IS 'Type of rainfall at sunset';
+COMMENT ON COLUMN ecobat_occurrences.wind_speed IS 'Wind speed at sunset in the unit defined by wind_speed_unit_id';
+COMMENT ON COLUMN ecobat_occurrences.wind_speed_unit_id IS 'Unit used for the wind speed measurement.';
 COMMENT ON COLUMN ecobat_occurrences.occurrence_id IS 'Foreign key to the occurrences table. Identifies the occurrence lodged in the main occurrences table for reference range records which are made publically available.';
 COMMENT ON COLUMN ecobat_occurrences.group_id IS 'Foreign key to the groups table. Identifies the Consultants Portal project the record belongs to  .';
 COMMENT ON COLUMN ecobat_occurrences.created_on IS 'Date this record was created.';

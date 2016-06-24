@@ -43,6 +43,7 @@ function ecobat_scheduled_task($last_run_date, $db) {
   // Insert the occurrences that have been imported into the reference range which can be made public.
   // We'll only do this once a day.
   if (substr(date('c', time()), 0, 10) <> substr($last_run_date, 0, 10)) {
+    echo 'Inserting ecobat occurrences<br/>';
     _ecobat_insert_occurrences($db);
   }
 }
@@ -55,13 +56,10 @@ function _ecobat_update_reporting_fields($last_run_date, $db) {
 UPDATE ecobat_occurrences eo SET
   easting=ST_X(ST_Centroid(ST_Transform(geom, 27700))),
   northing=ST_Y(ST_Centroid(ST_Transform(geom, 27700))),
-  external_key=cttl.external_key,
-  roost_external_key=cttlroost.external_key
-FROM cache_taxa_taxon_lists cttl,
-  cache_taxa_taxon_lists cttlroost
+  external_key=cttl.external_key
+FROM cache_taxa_taxon_lists cttl
 WHERE eo.created_on>='$last_run_date'
 AND cttl.id=eo.taxa_taxon_list_id
-AND cttlroost.id=eo.taxa_taxon_list_id
 QRY
   );
 }
@@ -96,7 +94,7 @@ function _ecobat_insert_occurrences($db) {
   $occAttrs = kohana::config('ecobat.occurrence_attrs');
   $passTerms = kohana::config('ecobat.pass_terms');
   // Find up to 2000 occurrences that need to be generated
-  $occs = $db->query('SELECT * from ecobat_occurrences WHERE occurrence_id IS NULL and sensitivity IS NOT NULL LIMIT 2000')
+  $occs = $db->query('SELECT * from ecobat_occurrences WHERE occurrence_id IS NULL AND sensitivity<3 LIMIT 2000')
      ->result_array(FALSE);
   $lastSample = '';
   $allSampleFields = array_merge(array(
@@ -105,6 +103,7 @@ function _ecobat_insert_occurrences($db) {
     'date_start',
     'group_id'
   ), array_keys($smpAttrs));
+  echo count($occs) . ' ecobat occurrences to process<br/>';
   foreach($occs as $ecobat_occurrence) {
     $thisSampleFields = array_intersect_key($ecobat_occurrence, array_combine($allSampleFields, $allSampleFields));
     $thisSample = implode('|', $thisSampleFields);
@@ -118,7 +117,7 @@ function _ecobat_insert_occurrences($db) {
         'date_type'=>'D',
         'entered_sref' => $ecobat_occurrence['entered_sref'],
         'entered_sref_system' => $ecobat_occurrence['entered_sref_system'],
-        'privacy_precision' => $ecobat_occurrence['sensitivity']
+        'privacy_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null
       );
       foreach ($smpAttrs as $ecobatFieldName => $attrId) {
         $s[$attrId] = $ecobat_occurrence[$ecobatFieldName];
@@ -142,7 +141,7 @@ function _ecobat_insert_occurrences($db) {
       'survey_id' => kohana::config('ecobat.survey_id'),
       'sample_id' => $currentSampleId,
       'taxa_taxon_list_id' => $ecobat_occurrence['taxa_taxon_list_id'],
-      'sensitivity_precision' => $ecobat_occurrence['sensitivity']
+      'sensitivity_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null
     );
     foreach ($occAttrs as $ecobatFieldName => $attrId) {
       $s[$attrId] = $passTerms[$ecobat_occurrence[$ecobatFieldName]];
