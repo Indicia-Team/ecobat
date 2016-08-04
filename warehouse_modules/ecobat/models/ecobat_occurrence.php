@@ -41,7 +41,6 @@ class Ecobat_occurrence_Model extends ORM {
     'anthropogenic_feature_adjacent'=>'termlists_term',
     'anthropogenic_feature_25m'=>'termlists_term',
     'rainfall'=>'termlists_term',
-    'wind_speed_unit'=>'termlists_term',
     'group'
   );
 
@@ -67,13 +66,12 @@ class Ecobat_occurrence_Model extends ORM {
     $array->add_rules('anthropogenic_feature_25m_id', 'integer');
     $array->add_rules('temperature_c', 'maximum[45]');
     $array->add_rules('rainfall_id', 'integer');
-    $array->add_rules('wind_speed', 'integer');
-    $array->add_rules('wind_speed_unit_id', 'integer');
+    $array->add_rules('wind_speed_mph', 'integer');
     $array->add_rules('occurrence_id', 'integer');
     $array->add_rules('group_id', 'integer');
     $this->unvalidatedFields = array('external_key', 'geom', 'detector_make_other',
       'detector_model', 'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
-      'roost_species', 'notes', 'upload_guid');
+      'roost_species', 'notes', 'import_guid');
     return parent::validate($array, $save);
   }
 
@@ -129,13 +127,7 @@ class Ecobat_occurrence_Model extends ORM {
         'datatype' => 'lookup',
         'lookup_values' => '1:Public,2:Blur records to 10km grid square,3:Do not publish',
         'default'=>'100'
-      ),
-      'ecobat_occurrence:wind_speed_unit_id' => array(
-        'display' => 'Wind speed unit',
-        'description' => 'Select the unit used for the wind speed.',
-        'datatype' => 'lookup',
-        'population_call' => 'report:library/terms/terms_list:termlists_term_id:term:termlist_external_key=ecobat:wind_speed_units,termlist_id='
-      ),
+      )
     );
     return $retVal;
   }
@@ -160,17 +152,17 @@ class Ecobat_occurrence_Model extends ORM {
   private function preSubmitFillInGeom() {
     //
     if (array_key_exists('entered_sref', $this->submission['fields']) &&
-      array_key_exists('entered_sref_system', $this->submission['fields']) &&
-      !(array_key_exists('geom', $this->submission['fields']) && $this->submission['fields']['geom']['value']) &&
-      $this->submission['fields']['entered_sref']['value'] &&
-      $this->submission['fields']['entered_sref_system']['value']) {
+        array_key_exists('entered_sref_system', $this->submission['fields']) &&
+        !(array_key_exists('geom', $this->submission['fields']) && $this->submission['fields']['geom']['value']) &&
+        $this->submission['fields']['entered_sref']['value'] &&
+        $this->submission['fields']['entered_sref_system']['value']) {
       try {
         $this->submission['fields']['geom']['value'] = spatial_ref::sref_to_internal_wkt(
           $this->submission['fields']['entered_sref']['value'],
           $this->submission['fields']['entered_sref_system']['value']
         );
       } catch (Exception $e) {
-        $this->errors['entered_sref'] = $e->getMessage();
+        throw new Exception('The grid reference or lat long point provided was invalid: ' . $this->submission['fields']['entered_sref']['value']);
       }
     }
   }
@@ -184,7 +176,7 @@ class Ecobat_occurrence_Model extends ORM {
   }
 
   private function preSubmitFillInSensitivity() {
-    $mappings = array('open' => 1, '10kmbuffer'=>2, 'sensitive'=>3);
+    $mappings = array('open' => 1, 'shared' => 1, '10kmbuffer'=>2, 'sensitive'=>3);
     if (array_key_exists('sensitivity', $this->submission['fields']) &&
         !empty($this->submission['fields']['sensitivity']['value']) &&
         !empty($mappings[strtolower(str_replace(' ', '', $this->submission['fields']['sensitivity']['value']))])) {

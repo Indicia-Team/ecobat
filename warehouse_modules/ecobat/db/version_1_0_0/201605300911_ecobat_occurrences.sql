@@ -54,13 +54,6 @@ select insert_term('Drizzle', 'eng', 2, null, 'ecobat:rainfall');
 select insert_term('Heavy', 'eng', 3, null, 'ecobat:rainfall');
 select insert_term('Other', 'eng', 4, null, 'ecobat:rainfall');
 
-INSERT INTO termlists (title, description, created_on, created_by_id, updated_on, updated_by_id, external_key)
-VALUES ('Ecobat wind speed units', 'List of units for measuring wind speed.', now(), 1, now(), 1, 'ecobat:wind_speed_units');
-
-select insert_term('Beaufort', 'eng', 1, null, 'ecobat:wind_speed_units');
-select insert_term('Mph', 'eng', 2, null, 'ecobat:wind_speed_units');
-select insert_term('Other', 'eng', 3, null, 'ecobat:wind_speed_units');
-
 CREATE TABLE ecobat_occurrences
 (
   id serial NOT NULL,
@@ -84,14 +77,13 @@ CREATE TABLE ecobat_occurrences
   roost_within_25m boolean NOT NULL DEFAULT FALSE,
   activity_elevated_by_roost boolean NOT NULL DEFAULT FALSE,
   roost_species character varying,
-  linear_feature_adjacent_id integer NOT NULL,
-  linear_feature_25m_id integer NOT NULL,
-  anthropogenic_feature_adjacent_id integer NOT NULL,
-  anthropogenic_feature_25m_id integer NOT NULL,
+  linear_feature_adjacent_id integer,
+  linear_feature_25m_id integer,
+  anthropogenic_feature_adjacent_id integer,
+  anthropogenic_feature_25m_id integer,
   temperature_c numeric(4,2),
   rainfall_id integer,
-  wind_speed integer,
-  wind_speed_unit_id integer,
+  wind_speed_mph integer,
   notes character varying,
   occurrence_id integer,
   group_id integer,
