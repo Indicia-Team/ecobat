@@ -1,12 +1,16 @@
 <report
-    title="Reference output count"
-    description="Provides a count of the records included in a reference range filter"
+    title="Reference output count count for range"
+    description="Provides a count of the records included in a reference range filter based on the range of values from a selection of records"
     >
   <query>
-    select count(*) as filtercount
+    select cttl.preferred_taxon, count(*) as filtercount
     from ecobat_occurrences o
+    join cache_taxa_taxon_lists cttl on cttl.id=o.taxa_taxon_list_id
     where 1=1
+    and o.external_key in (#input_taxa_taxon_list_external_keys#)
     #filters#
+    group by cttl.preferred_taxon
+    order by cttl.preferred_taxon
   </query>
   <params>
     <param name="filter_spatial_km" display="Limit area km" description="Number of km of radius to limit the reference set to." datatype="integer" default="">
@@ -35,5 +39,6 @@
            datatype="float" default="-1000" emptyvalue="-1000" />
     <param name="input_wind_high" display="Wind speed high" description="Highest wind speed at sunset for range of records being input into the report in mph"
            datatype="float" default="-1000" emptyvalue="-1000" />
+    <param name="input_taxa_taxon_list_external_keys" display="List of external keys of the species to analyse" datatype="text[]" />
   </params>
 </report>

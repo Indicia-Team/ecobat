@@ -3,7 +3,7 @@
     description="Basic output of a reference range calculation for a range of static bat detector record nights."
 >
   <query>
-    select fullset.id, fullset.date_start as date, cttl.preferred_taxon as species, fullset.entered_sref,
+    select fullset.id, fullset.date_start as date, cttl.preferred_taxon as taxon, cttl.default_common_name as common_name, fullset.entered_sref,
       fullset.passes, round(fullset.percentile*100) as percentile
     from (
       select import_guid, id, date_start, taxa_taxon_list_id, entered_sref, passes,
@@ -16,7 +16,7 @@
     where fullset.import_guid='#input_import_guid#'
   </query>  
   <order_bys>
-    <order_by>date_start</order_by>
+    <order_by>cttl.preferred_taxon, fullset.date_start</order_by>
   </order_bys>
   <params>
     <param name="filter_spatial_km" display="Limit area km" description="Number of km of radius to limit the reference set to." datatype="integer" default="">

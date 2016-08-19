@@ -1,11 +1,12 @@
 <report
     title="Reference output count for range"
-    description="Provides a count of the records included in a reference range filter based on the range of values from a selection of records"
+    description="Provides a count of the records included in a reference range filter"
     >
   <query>
     select count(*) as filtercount
     from ecobat_occurrences o
     where 1=1
+    and o.external_key='#input_taxa_taxon_list_external_key#'
     #filters#
   </query>
   <params>
@@ -33,13 +34,15 @@
     <param name="filter_wind" display="Limit to similar wind speed" description="Limit to records +/- 2mph of the input" datatype="boolean" default="">
       <where>wind_speed_mph between #input_wind#-2 and #input_wind#+2</where>
     </param>
-    <param name="filter_definition_of_pass" display="Limit to similar wind speed" description="Limit to records +/- 2mph of the input" datatype="boolean" default="">
-      <where>wind_speed_mph between #input_wind#-2 and #input_wind#+2</where>
+    <param name="filter_definition_of_pass" display="Limit to same pass definition" description="Limit to records with same definition of pass" datatype="boolean" default="">
+      <where>pass_definition_id = #input_pass_definition_id#</where>
     </param>
+    <param name="input_taxa_taxon_list_external_key" display="Species external key" description="Preferred external key of the species being input into the report" datatype="text" />
     <param name="input_date" display="Date" description="Date of the record to compare against" datatype="date" default="" />
     <param name="input_passes" display="Passes per night" description="Number of passes being input into the report" datatype="integer" />
     <param name="input_geom" display="Geometry" description="Geometry of site being passed into the report" datatype="text" />
     <param name="input_temp" display="Temperature" description="Temperature at sunset being input into the report in degC" datatype="float" default="-1000" />
     <param name="input_wind" display="Wind speed" description="Wind speed at sunset in mph" datatype="float" default="-1000" />
+    <param name="input_pass_definition_id" display="Pass definition" description="Pass definition for record to compare against" datatype="integer" default="" />
   </params>
 </report>
