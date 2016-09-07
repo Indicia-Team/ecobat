@@ -7,7 +7,8 @@
     avg(st_x(st_centroid(st_transform(geom, 27700)))) as x_avg, avg(st_y(st_centroid(st_transform(geom, 27700)))) as y_avg,
     min(temperature_c) as temperature_c_low, max(temperature_c) as temperature_c_high,
     min(wind_speed_mph) as wind_speed_mph_low, max(wind_speed_mph) as wind_speed_mph_high,
-    string_agg(external_key, ',') as taxa_taxon_list_external_keys
+    string_agg(external_key, ',') as taxa_taxon_list_external_keys,
+    string_agg(distinct pass_definition_id::varchar, ',') as pass_definition_ids
     from ecobat_occurrences
     where import_guid='#input_import_guid#'
   </query>
