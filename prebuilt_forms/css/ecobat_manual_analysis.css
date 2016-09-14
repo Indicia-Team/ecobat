@@ -1,0 +1,19 @@
+form fieldset {
+  padding-left: 30px;
+}
+form fieldset ul {
+  margin: 0;
+}
+form fieldset label {
+  margin: 0;
+}
+fieldset label .ctrl-wrap {
+  display: inline-block;
+}
+fieldset label.auto {
+  display: block;
+  padding: 5px 0;
+}
+fieldset .helpText {
+  margin-left: 0;
+}
