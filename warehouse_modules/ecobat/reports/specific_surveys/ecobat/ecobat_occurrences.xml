@@ -34,7 +34,6 @@
     <column name="passes" display="Passes" sql="passes" datatype="integer"/>
     <column name="pass_definition" display="Pass definition" sql="pd.term" datatype="text"/>
     <column name="detector_make" display="Detector make" sql="dm.term" datatype="text"/>
-    <column name="detector_make_other" display="Detector make other" sql="detector_make_other" datatype="text"/>
     <column name="detector_model" display="Detector model" sql="detector_model" datatype="text"/>
     <column name="detector_height_m" display="Detector height (m)" sql="detector_height_m" datatype="float"/>
     <column name="roost_within_25m" display="" sql="roost_within_25m" datatype="boolean"/>
