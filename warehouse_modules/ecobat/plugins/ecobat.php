@@ -294,8 +294,8 @@ from (
     coalesce(eochild.wind_speed_mph, -1) = coalesce(eo.wind_speed_mph, -1) and
     coalesce(eochild.notes, '') = coalesce(eo.notes, '') and
     eochild.import_guid = eo.import_guid
+  where eo.created_on>='$last_run_date'
   group by eo.id
-  where eo.created_on>='$last_run_date';
 ) as children,
   (
   select eo.id, sum(coalesce(eograndchild.passes, 0)) as passes_summed
@@ -325,8 +325,8 @@ from (
     coalesce(eograndchild.wind_speed_mph, -1) = coalesce(eo.wind_speed_mph, -1) and
     coalesce(eograndchild.notes, '') = coalesce(eo.notes, '') and
     eograndchild.import_guid = eo.import_guid
+  where eo.created_on>='$last_run_date'
   group by eo.id
-  where eo.created_on>='$last_run_date';
 ) as grandchildren
 where children.id=ecobat_occurrences.id and grandchildren.id=ecobat_occurrences.id;
 QRY;
