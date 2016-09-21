@@ -18,6 +18,9 @@
     <param name="map_sq_10km_id_list" display="Map square list" description="List of 10km map squares to include" datatype="integer[]" default="" >
       <where>map_sq_10km_id in (#idlist#)</where>
     </param>
+    <param name="currentUser" display="User ID" datatype="integer" default="">
+      <where>u.id=#currentUser#</where>
+    </param>
   </params>
   <columns>
     <column name="import_guid" visible="false" sql="import_guid" in_count="true" />
