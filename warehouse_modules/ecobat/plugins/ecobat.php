@@ -123,7 +123,8 @@ SELECT
         'date_type'=>'D',
         'entered_sref' => $ecobat_occurrence['entered_sref'],
         'entered_sref_system' => $ecobat_occurrence['entered_sref_system'],
-        'privacy_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null
+        'privacy_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null,
+        'record_status' => 'C'
       );
       foreach ($smpAttrs as $ecobatFieldName => $attrId) {
         $s[$attrId] = $ecobat_occurrence[$ecobatFieldName];
