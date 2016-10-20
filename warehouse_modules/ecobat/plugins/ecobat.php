@@ -148,7 +148,8 @@ SELECT
       'survey_id' => kohana::config('ecobat.survey_id'),
       'sample_id' => $currentSampleId,
       'taxa_taxon_list_id' => $ecobat_occurrence['taxa_taxon_list_id'],
-      'sensitivity_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null
+      'sensitivity_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null,
+      'record_status' => 'C'
     );
     foreach ($occAttrs as $ecobatFieldName => $attrId) {
       $s[$attrId] = $passTerms[$ecobat_occurrence[$ecobatFieldName]];
