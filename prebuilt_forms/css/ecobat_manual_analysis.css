@@ -1,3 +1,9 @@
+div.region.region-two-50-first {
+  width: 40%;
+}
+div.region.region-two-50-second {
+  width: 60%;
+}
 #filter-tab ul {
   margin: 0 0 0 30px;
 }
@@ -11,4 +17,19 @@
 }
 #filter-tab .helpText {
   margin-left: 30px;
+}
+.percent-bar {
+  border: solid grey 1px;
+  height: 12px;
+  display: none;
+  position: relative;
+}
+.percent-bar .value {
+  height: 12px;
+  background: orangered;
+}
+.percent-bar-label {
+  left: -30px;
+  position: relative;
+  display: none;
 }

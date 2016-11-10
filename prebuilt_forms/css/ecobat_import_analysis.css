@@ -17,3 +17,31 @@ fieldset label.auto {
 fieldset .helpText {
   margin-left: 0;
 }
+.percent-bar {
+  border: solid grey 1px;
+  height: 12px;
+  display: none;
+  position: relative;
+}
+.percent-bar .value {
+  height: 12px;
+  background: orangered;
+}
+.percent-bar-label {
+  left: -30px;
+  position: relative;
+  display: none;
+}
+.percent-bar-t-horiz {
+  height: 0px;
+  position: absolute;
+  border: solid 1px black;
+  top: 5px;
+}
+.percent-bar-t-vert {
+  border-left: solid 2px black;
+  border-right: solid 2px black;
+  height: 10px;
+  top: 1px;
+  position: absolute;
+}

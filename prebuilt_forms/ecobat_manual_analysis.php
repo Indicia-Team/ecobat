@@ -30,20 +30,29 @@ class iform_ecobat_manual_analysis {
   /**
    * Get the list of parameters for this form.
    * @return array List of parameters that this form requires.
-   * @todo: Implement this method
    */
   public static function get_parameters() {
-    return array(array(
-      'fieldname'=>'taxon_list_id',
-      'label'=>'Species List ',
-      'helpText'=>'The species list that species can be selected from..',
-      'type'=>'select',
-      'table'=>'taxon_list',
-      'valueField'=>'id',
-      'captionField'=>'title',
-      'group'=>'Species',
-      'siteSpecific'=>true
-    ),);
+    require_once('includes/map.php');
+    return array_merge(array(
+        array(
+        'fieldname'=>'taxon_list_id',
+        'label'=>'Species List ',
+        'helpText'=>'The species list that species can be selected from.',
+        'type'=>'select',
+        'table'=>'taxon_list',
+        'valueField'=>'id',
+        'captionField'=>'title',
+        'group'=>'Species',
+        'siteSpecific'=>true
+      ),
+      array(
+        'fieldname'=>'default_pass_definition_id',
+        'label'=>'Default pass definition ID ',
+        'helpText'=>'The ID of the termlist term entry for the default pass definition to use.',
+        'type'=>'text_input',
+        'siteSpecific'=>true
+      )
+    ), iform_map_get_map_parameters());
   }
 
   /**
@@ -62,6 +71,9 @@ class iform_ecobat_manual_analysis {
       'map_helper',
       'report_helper'
     ));
+    $args = array_merge(array(
+      'default_pass_definition_id' => null
+    ), $args);
     data_entry_helper::$website_id=$args['website_id'];
     self::$auth = data_entry_helper::get_read_write_auth($args['website_id'], $args['password']);
     if (isset($_POST['input_date']) && (!isset($_POST['runAnalysis']) || $_POST['runAnalysis']!=='no')) {
@@ -161,6 +173,8 @@ class iform_ecobat_manual_analysis {
 $isOrAre in the {$percentile}$suffix percentile of bat activity for this species within its reference range.
 This is regarded as a night of $activityLevel bat activity. This was calculated by comparing this
 recording with $count records of $species nightly activity$filterText.</p>
+<div class="percent-bar"><div class="value" style="width: {$percentile}%"></div></div>
+<div class="percent-bar-label" style="margin-left: {$percentile}%">{$percentile}$suffix %ile</div>
 </fieldset>
 ANALYSIS;
     if ($count<1000) {
@@ -222,7 +236,8 @@ SUGGEST;
     global $indicia_templates;
     if (!empty($_POST))
       data_entry_helper::$entity_to_load = $_POST;
-    $col1 = data_entry_helper::date_picker(array(
+    $col1 = '<p>Fields marked with a <span class="deh-required">*</span> require you to fill in a value.</p>';
+    $col1 .= data_entry_helper::date_picker(array(
       'label' => 'Date',
       'fieldname' => 'input_date',
       'class' => 'control-width-4',
@@ -259,7 +274,8 @@ SUGGEST;
         'preferred' => 't'
       ),
       'blankText' => '<Please select>',
-      'validation' => array('required')
+      'validation' => array('required'),
+      'default' => $args['default_pass_definition_id']
     ));
     $col1 .= data_entry_helper::sref_and_system(array(
       'label' => 'Map ref',
@@ -270,20 +286,17 @@ SUGGEST;
       'label' => 'Temperature',
       'fieldname' => 'input_temp',
       'class' => 'control-width-4',
-      'helpText' => 'Temperature at sunset in &deg;C',
+      'helpText' => 'Temperature at sunset in &deg;C (optional)',
       'afterControl' => '&deg;C'
     ));
     $col1 .= data_entry_helper::text_input(array(
       'label' => 'Wind speed',
       'fieldname' => 'input_wind',
       'class' => 'control-width-4',
-      'helpText' => 'Wind speed at sunset in mph',
+      'helpText' => 'Wind speed at sunset in mph (optional)',
       'afterControl' => 'mph'
     ));
-    $col2 = map_helper::map_panel(array(
-      'presetLayers' => array('osm'),
-      'width' => '100%'
-    ));
+    $col2 = map_helper::map_panel(iform_map_get_map_options($args, null), iform_map_get_ol_options($args));
     $firstTab = '<div class="at-panel panel-display two-50 clearfix">' .
       "<div class=\"region region-two-50-first\"><div class=\"region-inner clearfix\">$col1</div></div>" .
       "<div class=\"region region-two-50-second\"><div class=\"region-inner clearfix\">$col2</div></div>" .

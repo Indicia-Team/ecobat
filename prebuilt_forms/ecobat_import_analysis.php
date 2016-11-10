@@ -132,6 +132,8 @@ class iform_ecobat_import_analysis {
 
   private static function showOutput($results, $params, $referenceCounts) {
     // chunk the results up by species to output separate results for each
+    helper_base::add_resource('jqplot');
+    helper_base::add_resource('jqplot_bar');
     $taxaDefs = array();
     $currentTaxon = '';
     $currentTaxonResults = [];
@@ -185,6 +187,10 @@ class iform_ecobat_import_analysis {
 $isOrAre in the {$percentile}$suffix percentile of bat activity for this species within its reference range.
 This is regarded as a night of $activityLevel bat activity. This was calculated by comparing this
 recording with $referenceCount records of $species nightly activity$filterText.</p>
+<div class="percent-bar">
+<div class="value" style="width: {$percentile}%"></div>
+</div>
+<div class="percent-bar-label" style="margin-left: {$percentile}%">{$percentile}$suffix %ile</div>
 </fieldset>
 ANALYSIS;
     return $r;
@@ -292,11 +298,17 @@ ANALYSIS;
     $activitySummary = empty($commaJoinedPhrases) ? $lastPhrase : "$commaJoinedPhrases and $lastPhrase";
     $count = count($percentiles);
     $median = self::getMedian($percentiles);
-    $breakdown = '';
+    $medianSuffix = self::ordinalSuffix($median);
 
     if ($allSameActivity) {
       $breakdown = "All the nights had $highestPasses pass$es and were on the " .
         "$highestPercentile$highestPercentileSuffix percentile.";
+      $bar = <<<SIMPLE
+<div class="percent-bar">
+<div class="value" style="width: {$highestPercentile}%"></div>
+</div>
+<div class="percent-bar-label" style="margin-left: {$highestPercentile}%">{$highestPercentile}$highestPercentileSuffix %ile</div>
+SIMPLE;
     } else {
       // Confidence interval calculation
       // @see https://www.ucl.ac.uk/ich/short-courses-events/about-stats-courses/stats-rm/Chapter_8_Content/confidence_interval_single_median
@@ -317,17 +329,32 @@ ANALYSIS;
 The median percentile was $median $confidenceRangeText. The highest night of activity contained $highestPasses pass$es, 
 this was on the $highestPercentile$highestPercentileSuffix percentile.
 BREAKDOWN;
+      $t = '';
+      if ($confidenceRangeFrom >= 0) {
+        $tWidth = $confidenceTo - $confidenceFrom;
+        $t = <<<TBAR
+<div class="percent-bar-t-horiz" style="left: {$confidenceFrom}%; width: $tWidth%;"></div>
+<div class="percent-bar-t-vert" style="left: {$confidenceFrom}%; width: $tWidth%;"></div>
+TBAR;
+      }
+      $bar = <<<ADV
+<div class="percent-bar">
+$t
+<div class="value" style="width: {$median}%"></div>
+</div>
+<div class="percent-bar-label" style="margin-left: {$median}%">{$median}$medianSuffix %ile</div>
+ADV;
     }
     $filterText = self::getFilterText($params);
     $r = <<<ANALYSIS
-<fieldset><legend>Summary analysis</legend>
 <p>There were $count nights of surveying, $activitySummary. 
  $breakdown
  This was calculated by comparing this import with $referenceCount records of nightly activity$filterText.
 </p>
-</fieldset>
+$bar
 ANALYSIS;
-    return $r;
+
+    return "<fieldset><legend>Summary analysis</legend>$r</fieldset>\n";
   }
 
   /**
