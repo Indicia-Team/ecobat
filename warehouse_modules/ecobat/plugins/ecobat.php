@@ -103,11 +103,13 @@ LIMIT 2000
 SELECT
   )->result_array(FALSE);
   $lastSample = '';
+  // Fields we'll use to look for unique samples
   $allSampleFields = array_merge(array(
     'entered_sref',
     'entered_sref_system',
     'date_start',
-    'group_id'
+    'group_id',
+    'location_name'
   ), array_keys($smpAttrs));
   echo count($occs) . ' ecobat occurrences to process<br/>';
   foreach($occs as $ecobat_occurrence) {
@@ -123,6 +125,7 @@ SELECT
         'date_type'=>'D',
         'entered_sref' => $ecobat_occurrence['entered_sref'],
         'entered_sref_system' => $ecobat_occurrence['entered_sref_system'],
+        'location_name' => $ecobat_occurrence['location_name'],
         'privacy_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null,
         'record_status' => 'C'
       );

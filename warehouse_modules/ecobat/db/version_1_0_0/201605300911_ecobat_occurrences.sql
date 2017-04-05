@@ -152,7 +152,6 @@ COMMENT ON COLUMN ecobat_occurrences.passes IS 'Total number of passes during th
 COMMENT ON COLUMN ecobat_occurrences.passes_summed IS 'Calculated total number of passes during the night for this taxon including a sum of all the taxonomic children''s passes.';
 COMMENT ON COLUMN ecobat_occurrences.pass_definition_id IS 'Foreign key to the termlists_terms table. Defines the method used to identify a pass.';
 COMMENT ON COLUMN ecobat_occurrences.detector_make_id IS 'The makeof bat detector used, picked from a controlled list.';
-COMMENT ON COLUMN ecobat_occurrences.detector_make_other IS 'The make of bat detector used if not on the list.';
 COMMENT ON COLUMN ecobat_occurrences.detector_model IS 'The model of bat detector used.';
 COMMENT ON COLUMN ecobat_occurrences.detector_height_m IS 'Height of the detector from the ground in metres.';
 COMMENT ON COLUMN ecobat_occurrences.roost_within_25m IS 'Presence or absence of a roost within 25m.';
