@@ -25,7 +25,7 @@
   <columns>
     <column name="import_guid" visible="false" sql="import_guid" in_count="true" />
     <column name="date_time" display="Date time" sql="min(o.created_on)" aggregate="true" />
-    <column name="site_name" display="Site name(s)" sql="string_agg(distinct o.location_name, '; ')" />
+    <column name="site_name" display="Site name(s)" sql="string_agg(distinct o.location_name, '; ')" aggregate="true" />
     <column name="imported_by" display="Imported by" sql="p.surname || coalesce(', ' || p.first_name, '')" />
     <column name="records" display="# Records" sql="count(o.*)" aggregate="true" />
   </columns>
