@@ -1,0 +1,6 @@
+[
+  {
+    "survey_id":"420",
+    "fields":"ecobat_occurrence:fk_taxa_taxon_list=Species\necobat_occurrence:entered_sref=Location\necobat_occurrence:entered_sref_system=Spatial Reference System\necobat_occurrence:sensitivity\necobat_occurrence:date_start=Date\necobat_occurrence:passes=Passes per night\necobat_occurrence:fk_pass_definition=Definition of pass\necobat_occurrence:fk_detector_make=Detector make\necobat_occurrence:detector_model=Detector model\necobat_occurrence:detector_height_m=Detector height\necobat_occurrence:roost_within_25m=Within 25m of known roost\necobat_occurrence:activity_elevated_by_roost=Activity elevated as known roost nearby\necobat_occurrence:roost_species=Roost species\necobat_occurrence:fk_linear_feature_adjacent=Detector next to linear feature\necobat_occurrence:fk_linear_feature_25m=Detector <25m of linear feature\necobat_occurrence:fk_anthropogenic_feature_adjacent=Detecto next to anthropogenic feature\necobat_occurrence:fk_anthropogenic_feature_25m=Detector <25m of anthropogenic feature\necobat_occurrence:temperature_c=Sunset Temp (°C)\necobat_occurrence:fk_rainfall=Rainfall\necobat_occurrence:wind_speed_mph=Sunset Wind speed (mph)\necobat_occurrence:notes=Notes"
+  }
+]
