@@ -30,7 +30,7 @@
     <column name="latin_name" display="Latin name" sql="cttl.preferred_taxon" datatype="text"/>
     <column name="location_name" display="Site name" sql="o.location_name" datatype="text"/>
     <column name="sref" display="Map reference" sql="o.entered_sref" datatype="text"/>
-    <column name="sensitivity" display="Sensitivity" sql="case sensitivity when 1 then 'open' when 2 then '10km blur' when 3 then 'open' end" datatype="text"/>
+    <column name="sensitivity" display="Sensitivity" sql="case sensitivity when 1 then 'open' when 2 then '10km blur' when 3 then 'private' end" datatype="text"/>
     <column name="date" display="Date" sql="date_start" datatype="date"/>
     <column name="passes" display="Passes" sql="passes" datatype="integer"/>
     <column name="pass_definition" display="Pass definition" sql="pd.term" datatype="text"/>
