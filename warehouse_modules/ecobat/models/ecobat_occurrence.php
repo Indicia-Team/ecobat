@@ -117,14 +117,14 @@ class Ecobat_occurrence_Model extends ORM {
         'filterIncludesNulls' => TRUE
       ),
       'ecobat_occurrence:pass_definition_id' => array(
-        'display' => 'Pass definition',
+        'display' => 'Bat pass definition',
         'description' => 'Select the definition used as a criteria for the number of passes.',
         'datatype' => 'lookup',
         'population_call' => 'report:library/terms/terms_list:termlists_term_id:term:termlist_external_key=ecobat:pass_definitions,termlist_id='
       ),
       'ecobat_occurrence:sensitivity' => array(
-        'display' => 'Choose the sensitivity settings for the records.',
-        'description' => '',
+        'display' => 'Sensitivity of data',
+        'description' => 'Choose the sensitivity settings for the records.',
         'datatype' => 'lookup',
         'lookup_values' => '1:Public,2:Blur records to 10km grid square,3:Do not publish',
         'default'=>'100'
