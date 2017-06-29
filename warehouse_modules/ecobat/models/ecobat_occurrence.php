@@ -172,8 +172,9 @@ class Ecobat_occurrence_Model extends ORM {
     if (array_key_exists('date_start', $this->submission['fields']) &&
         !empty($this->submission['fields']['date_start']['value'])) {
       $date = $this->submission['fields']['date_start']['value'];
-      // str_replace to change separator frpom / to -, therefore treated as European not American order.
-      $this->submission['fields']['day_of_year']['value'] = date('z', strtotime(str_replace('/', '-', $date)));
+      // str_replace to change separator frpom / to -, therefore treated as European not American order. + 1 to match
+      // extract(doy) in PG, which is 1 indexed.
+      $this->submission['fields']['day_of_year']['value'] = date('z', strtotime(str_replace('/', '-', $date))) + 1;
     }
   }
 
