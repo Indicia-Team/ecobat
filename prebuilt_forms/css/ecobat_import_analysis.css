@@ -20,23 +20,25 @@ fieldset .helpText {
 .percent-bar {
   border: solid grey 1px;
   height: 12px;
-  display: none;
   position: relative;
 }
 .percent-bar .value {
   height: 12px;
   background: orangered;
+  position: relative;
+  z-index: 10;
 }
 .percent-bar-label {
-  left: -30px;
+  left: -40px;
+  font-size: 80%;
   position: relative;
-  display: none;
 }
 .percent-bar-t-horiz {
   height: 0px;
   position: absolute;
   border: solid 1px black;
   top: 5px;
+  z-index: 20;
 }
 .percent-bar-t-vert {
   border-left: solid 2px black;
@@ -44,4 +46,12 @@ fieldset .helpText {
   height: 10px;
   top: 1px;
   position: absolute;
+  z-index: 20;
+}
+.highest-percentile {
+  background-color: silver;
+  border-right: solid black 2px;
+  position: absolute;
+  z-index: 0;
+  height: 12px;
 }

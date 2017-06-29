@@ -21,7 +21,6 @@ div.region.region-two-50-second {
 .percent-bar {
   border: solid grey 1px;
   height: 12px;
-  display: none;
   position: relative;
 }
 .percent-bar .value {
@@ -29,7 +28,7 @@ div.region.region-two-50-second {
   background: orangered;
 }
 .percent-bar-label {
-  left: -30px;
+  left: -40px;
+  font-size: 80%;
   position: relative;
-  display: none;
 }

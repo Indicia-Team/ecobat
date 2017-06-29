@@ -174,7 +174,7 @@ $isOrAre in the {$percentile}$suffix percentile of bat activity for this species
 This is regarded as a night of $activityLevel bat activity. This was calculated by comparing this
 recording with $count records of $species nightly activity$filterText.</p>
 <div class="percent-bar"><div class="value" style="width: {$percentile}%"></div></div>
-<div class="percent-bar-label" style="margin-left: {$percentile}%">{$percentile}$suffix %ile</div>
+<div class="percent-bar-label" style="margin-left: {$percentile}%">{$percentile}$suffix percentile</div>
 </fieldset>
 ANALYSIS;
     if ($count<1000) {

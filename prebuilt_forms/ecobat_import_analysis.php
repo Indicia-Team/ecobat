@@ -190,7 +190,7 @@ recording with $referenceCount records of $species nightly activity$filterText.<
 <div class="percent-bar">
 <div class="value" style="width: {$percentile}%"></div>
 </div>
-<div class="percent-bar-label" style="margin-left: {$percentile}%">{$percentile}$suffix %ile</div>
+<div class="percent-bar-label" style="margin-left: {$percentile}%">{$percentile}$suffix percentile</div>
 </fieldset>
 ANALYSIS;
     return $r;
@@ -337,12 +337,15 @@ BREAKDOWN;
 <div class="percent-bar-t-vert" style="left: {$confidenceFrom}%; width: $tWidth%;"></div>
 TBAR;
       }
+      $t .= <<<HIGHEST
+<div class="highest-percentile" style="width: {$highestPercentile}%"></div>
+HIGHEST;
       $bar = <<<ADV
 <div class="percent-bar">
 $t
 <div class="value" style="width: {$median}%"></div>
 </div>
-<div class="percent-bar-label" style="margin-left: {$median}%">{$median}$medianSuffix %ile</div>
+<div class="percent-bar-label" style="margin-left: {$median}%">{$median}$medianSuffix percentile</div>
 ADV;
     }
     $filterText = self::getFilterText($params);
