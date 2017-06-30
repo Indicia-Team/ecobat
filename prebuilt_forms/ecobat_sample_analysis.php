@@ -7,18 +7,18 @@
  * @package Client
  * @subpackage PrebuiltForms
  */
-class iform_ecobat_import_analysis {
+class iform_ecobat_sample_analysis {
 
   private static $auth;
 
   /**
    * Return the form metadata.
    */
-  public static function get_ecobat_import_analysis_definition() {
+  public static function get_ecobat_sample_analysis_definition() {
     return array(
-      'title'=>'Ecobat import analysis form',
+      'title'=>'Ecobat sample analysis form',
       'category' => 'Ecobat',
-      'description'=>'Form for using an import to feed into an Ecobat analysis.'
+      'description'=>'Form for using an combination of grid ref, date and location name to feed into an Ecobat analysis.'
     );
   }
 
@@ -40,8 +40,8 @@ class iform_ecobat_import_analysis {
    * @return Form HTML.
    */
   public static function get_form($args, $nid, $response=null) {
-    if (!isset($_REQUEST['import_guid']))
-      return 'Invalid link. The import to analyse needs to be provided in an import_guid parameter in the URL.';
+    if (!isset($_REQUEST['grid_ref']) || !isset($_REQUEST['date_start']) || !isset($_REQUEST['location_name']))
+      return 'Invalid link. The sample to analyse needs to be provided in grid_ref, date_start and location_name parameters in the URL.';
     iform_load_helpers(array(
       'data_entry_helper',
       'map_helper',
@@ -61,10 +61,12 @@ class iform_ecobat_import_analysis {
     hostsite_set_page_title(lang::get('Analysis output'));
 
     $importValuesQuery = report_helper::get_report_data(array(
-      'dataSource' => 'specific_surveys/ecobat/input_params_for_import',
+      'dataSource' => 'specific_surveys/ecobat/input_params_for_sample',
       'readAuth' => self::$auth['read'],
       'extraParams' => array(
-        'input_import_guid' => $_REQUEST['import_guid']
+        'input_grid_ref' => $_REQUEST['grid_ref'],
+        'input_date_start' => $_REQUEST['date_start'],
+        'input_location_name' => $_REQUEST['location_name']
       )
     ));
     $importValuesForInput = $importValuesQuery[0];
@@ -77,7 +79,7 @@ class iform_ecobat_import_analysis {
     $pass_definitions = explode(',', $importValuesForInput['pass_definition_ids']);
     if (count($pass_definitions)>1) {
       hostsite_show_message(lang::get('The import is not suitable for analysis because it contains records which use ' .
-        'a mixture of pass definitions.'), 'warning');
+          'a mixture of pass definitions.'), 'warning');
       hostsite_show_message(var_export($pass_definitions, true));
       return lang::get('Analysis cannot be completed.');
     }
@@ -103,14 +105,18 @@ class iform_ecobat_import_analysis {
     );
 
     // additional parameter to specify which import to work against
-    $params['input_import_guid'] = $_REQUEST['import_guid'];
+    $params['input_grid_ref'] = $_REQUEST['grid_ref'];
+    $params['input_date_start'] = $_REQUEST['date_start'];
+    $params['input_location_name'] = $_REQUEST['location_name'];
     return report_helper::report_grid(array(
-      'dataSource' => 'specific_surveys/ecobat/reference_output_for_import',
+      'dataSource' => 'specific_surveys/ecobat/reference_output_for_sample',
       'readAuth' => self::$auth['read'],
       'extraParams' => $params,
       'downloadLink' => true
     ));
   }
+
+
 
   private static function paramsForm($args) {
     global $indicia_templates;
