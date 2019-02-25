@@ -15,7 +15,7 @@ CREATE TABLE ecobat_occurrence_passes
   pass_definition_id integer NOT NULL,
   detector_make_id integer NOT NULL,
   detector_model character varying NOT NULL,
-  detector_id character varying,
+  detector_id character varying NOT NULL,
   detector_height_m numeric(4,2),
   roost_within_25m boolean NOT NULL DEFAULT FALSE,
   activity_elevated_by_roost boolean NOT NULL DEFAULT FALSE,
