@@ -9,11 +9,13 @@ CREATE TABLE ecobat_occurrence_passes
   lon float,
   geom geometry(Geometry,900913),
   sensitivity integer NOT NULL default 1,
+  number_of_bats integer NOT NULL default 1,
   date_start date NOT NULL,
   pass_time time NOT NULL,
   pass_definition_id integer NOT NULL,
   detector_make_id integer NOT NULL,
   detector_model character varying NOT NULL,
+  detector_id character varying,
   detector_height_m numeric(4,2),
   roost_within_25m boolean NOT NULL DEFAULT FALSE,
   activity_elevated_by_roost boolean NOT NULL DEFAULT FALSE,
@@ -32,7 +34,6 @@ CREATE TABLE ecobat_occurrence_passes
   updated_on timestamp without time zone NOT NULL, -- Date this record was last updated.
   updated_by_id integer NOT NULL,
   import_guid character varying,
-  location_name character varying,
   processed boolean default false,
   CONSTRAINT pk_ecobat_occurrence_passes PRIMARY KEY (id),
   CONSTRAINT fk_ecobat_occurrence_passes_taxon FOREIGN KEY (taxa_taxon_list_id)
@@ -84,11 +85,13 @@ COMMENT ON COLUMN ecobat_occurrence_passes.lat IS 'WGS84 latitude for the record
 COMMENT ON COLUMN ecobat_occurrence_passes.lon IS 'WGS84 longitiude for the record.';
 COMMENT ON COLUMN ecobat_occurrence_passes.geom IS 'Geometry for the record.';
 COMMENT ON COLUMN ecobat_occurrence_passes.sensitivity IS 'Sensitivity preferences for the record. 1=open, 2=10km blur, 3=open.';
+COMMENT ON COLUMN ecobat_occurrence_passes.number_of_bats IS 'Count of bats represented by this data row.';
 COMMENT ON COLUMN ecobat_occurrence_passes.date_start IS 'Date at the start of the nights surveying.';
 COMMENT ON COLUMN ecobat_occurrence_passes.pass_time IS 'Time of the pass.';
 COMMENT ON COLUMN ecobat_occurrence_passes.pass_definition_id IS 'Foreign key to the termlists_terms table. Defines the method used to identify a pass.';
 COMMENT ON COLUMN ecobat_occurrence_passes.detector_make_id IS 'The makeof bat detector used, picked from a controlled list.';
 COMMENT ON COLUMN ecobat_occurrence_passes.detector_model IS 'The model of bat detector used.';
+COMMENT ON COLUMN ecobat_occurrence_passes.detector_id IS 'Identifier of the individual detector.';
 COMMENT ON COLUMN ecobat_occurrence_passes.detector_height_m IS 'Height of the detector from the ground in metres.';
 COMMENT ON COLUMN ecobat_occurrence_passes.roost_within_25m IS 'Presence or absence of a roost within 25m.';
 COMMENT ON COLUMN ecobat_occurrence_passes.activity_elevated_by_roost IS 'Flag set if activity was elevated because of the presence of a roost.';
@@ -107,7 +110,6 @@ COMMENT ON COLUMN ecobat_occurrence_passes.created_by_id IS 'Foreign key to the 
 COMMENT ON COLUMN ecobat_occurrence_passes.updated_on IS 'Date this record was last updated.';
 COMMENT ON COLUMN ecobat_occurrence_passes.updated_by_id IS 'Foreign key to the users table (last updater).';
 COMMENT ON COLUMN ecobat_occurrence_passes.import_guid IS 'Unique identifier of the import event which added this record.';
-COMMENT ON COLUMN ecobat_occurrence_passes.location_name IS 'Free text site name';
 
 CREATE INDEX ix_ecobat_occurrence_passes_import_guid
   ON ecobat_occurrence_passes (import_guid ASC NULLS LAST);
