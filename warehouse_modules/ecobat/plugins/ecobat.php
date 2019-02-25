@@ -174,6 +174,7 @@ AND eop.date_start=eo.date_start
 AND eop.pass_definition_id=eo.pass_definition_id
 AND eop.detector_make_id=eo.detector_make_id
 AND eop.detector_model=eo.detector_model
+AND eop.detector_identity=eo.location_name
 AND COALESCE(eop.detector_height_m, 0)=COALESCE(eo.detector_height_m, 0)
 AND eop.roost_within_25m=eo.roost_within_25m
 AND eop.activity_elevated_by_roost=eo.activity_elevated_by_roost
@@ -188,7 +189,6 @@ AND COALESCE(eop.wind_speed_mph, 0)=COALESCE(eo.wind_speed_mph, 0)
 AND COALESCE(eop.group_id, 0)=COALESCE(eo.group_id, 0)
 AND eop.created_by_id=eo.created_by_id
 AND COALESCE(eop.import_guid, '')=COALESCE(eo.import_guid, '')
-AND COALESCE(eop.location_name, '')=COALESCE(eo.location_name, '')
 AND eop.ecobat_occurrence_id IS NULL;
 
 UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false;
