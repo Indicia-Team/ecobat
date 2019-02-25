@@ -71,21 +71,6 @@ QRY
 }
 
 function rollup_passes_into_occurrences($db) {
-
-
-
-
-
-  // @todo
-  // UPDATE to link via ecobat_occurrence_id
-
-
-
-
-
-
-
-
   $db->query(<<<QRY
 INSERT INTO ecobat_occurrences (
   taxa_taxon_list_id,
