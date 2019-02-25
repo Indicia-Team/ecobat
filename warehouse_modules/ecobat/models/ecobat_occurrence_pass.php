@@ -49,6 +49,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
     $array->add_rules('sensitivity', 'integer', 'required');
     $array->add_rules('date_start', 'date', 'required');
     $array->add_rules('pass_time', 'required');
+    $array->add_rules('number_of_bats', 'integer', 'required');
     $array->add_rules('pass_definition_id', 'integer', 'required');
     $array->add_rules('detector_make_id', 'integer');
     $array->add_rules('linear_feature_adjacent_id', 'integer');
@@ -62,8 +63,8 @@ class Ecobat_occurrence_pass_Model extends ORM {
     $array->add_rules('group_id', 'integer');
     $this->unvalidatedFields = array(
       'external_key', 'geom', 'detector_make_other',
-      'detector_model', 'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
-      'roost_species', 'import_guid', 'location_name', 'processed', 'pass_time',
+      'detector_model', 'detector_id', 'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
+      'roost_species', 'import_guid', 'processed', 'pass_time',
     );
     return parent::validate($array, $save);
   }
