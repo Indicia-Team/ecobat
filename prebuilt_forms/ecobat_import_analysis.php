@@ -99,17 +99,39 @@ class iform_ecobat_import_analysis {
       'filter_temp' => $_POST['filter_temp'],
       'filter_wind' => $_POST['filter_wind'],
       // this filter is forced on
-      'filter_pass_definition' => '1'
+      'filter_pass_definition' => '1',
+      // additional parameter to specify which import to work against
+      'input_import_guid' => $_REQUEST['import_guid']
     );
-
-    // additional parameter to specify which import to work against
-    $params['input_import_guid'] = $_REQUEST['import_guid'];
-    return report_helper::report_grid(array(
-      'dataSource' => 'specific_surveys/ecobat/reference_output_for_import',
-      'readAuth' => self::$auth['read'],
-      'extraParams' => $params,
-      'downloadLink' => true
-    ));
+    if (!empty($_POST['shiny'])) {
+      $url = 'https://ecobat.shinyapps.io/ecobat_analysis?' . http_build_query($params);
+      header('Location: ' . $url);
+      die();
+    }
+    if (!empty($_POST['tabular'])) {
+      return report_helper::report_grid(array(
+        'dataSource' => 'specific_surveys/ecobat/reference_output_for_import',
+        'readAuth' => self::$auth['read'],
+        'extraParams' => $params,
+        'downloadLink' => TRUE
+      ));
+    } else {
+      $r = '<h2>Generating an analysis report</h2>';
+      $r .= '<ul class="task-list">';
+      $r .= '<li><h3>Step 1</h3><p>Please click this link to download results of your analysis as raw data (essential for step 2).</p>';
+      $r .= report_helper::report_download_link(array(
+        'dataSource' => 'specific_surveys/ecobat/reference_output_for_import',
+        'readAuth' => self::$auth['read'],
+        'extraParams' => $params,
+        'class' => 'button'
+      ));
+      $r .= '</li>';
+      $r .= '<li><h3>Step 2</h3><p>Upload your results into the analysis app (link below) to generate your personalised analysis report.</p>';
+      $r .= '<a href="/advanced-data-analysis">Generate analysis report</a>';
+      $r .= '</li>';
+      $r .= '</ul>';
+      return $r;
+    }
   }
 
   private static function paramsForm($args) {
@@ -117,6 +139,11 @@ class iform_ecobat_import_analysis {
     if (!empty($_POST))
       data_entry_helper::$entity_to_load = $_POST;
     $r = '<form method="POST">';
+    if (!empty($_GET['shiny'])) {
+      $r .= '<input type="hidden" name="shiny" value="true" />';
+    } elseif (!empty($_GET['tabular'])) {
+      $r .= '<input type="hidden" name="tabular" value="true" />';
+    }
     $r .= '<fieldset><legend>Date filter:</legend>';
     $r .= '<label class="auto">' . data_entry_helper::checkbox(array(
         'fieldname' => 'filter_date',
