@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Indicia, the OPAL Online Recording Toolkit.
  *
@@ -13,11 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/gpl.html.
  *
- * @package	Modules
- * @subpackage Ecobat
- * @author	Indicia Team
- * @license	http://www.gnu.org/licenses/gpl.html GPL
- * @link 	http://code.google.com/p/indicia/
+ * @author Indicia Team
+ * @license http://www.gnu.org/licenses/gpl.html GPL
+ * @link http://code.google.com/p/indicia/
  */
 
 $config['website_id'] = 123;
@@ -36,9 +35,9 @@ $config['sample_attrs'] = array(
   'temperature_c' => 'smpAttr:123',
   'rainfall_id' => 'smpAttr:123',
   'wind_speed' => 'smpAttr:123',
-  'wind_speed_unit_id' => 'smpAttr:123'
+  'wind_speed_unit_id' => 'smpAttr:123',
 );
 $config['occurrence_attrs'] = array(
   'passes' => 'occAttr:123',
-  'pass_definition_id' => 'occAttr:123'
+  'pass_definition_id' => 'occAttr:123',
 );
