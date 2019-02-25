@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Indicia, the OPAL Online Recording Toolkit.
  *
@@ -13,11 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/gpl.html.
  *
- * @package	Taxon Designations
- * @subpackage Plugins
- * @author	Indicia Team
- * @license	http://www.gnu.org/licenses/gpl.html GPL
- * @link 	http://code.google.com/p/indicia/
+ * @author Indicia Team
+ * @license http://www.gnu.org/licenses/gpl.html GPL
+ * @link http://code.google.com/p/indicia/
  */
 
 /**
@@ -27,7 +26,7 @@
  */
 function ecobat_extend_data_services() {
   return array(
-    'ecobat_occurrences'=>array()
+    'ecobat_occurrences' => array()
   );
 }
 
@@ -38,6 +37,8 @@ function ecobat_extend_data_services() {
  * @param $db
  */
 function ecobat_scheduled_task($last_run_date, $db) {
+  ecobat_passes_set_calc_fields($db);
+  rollup_passes_into_occurrences($db);
   _ecobat_update_reporting_fields($db);
   _ecobat_update_map_sq($last_run_date, $db);
   _ecobat_insert_missing_taxonomic_parents($last_run_date, $db);
@@ -48,6 +49,138 @@ function ecobat_scheduled_task($last_run_date, $db) {
     echo 'Inserting ecobat occurrences<br/>';
     _ecobat_insert_occurrences($db);
   }
+}
+
+/**
+ * Calculate field values in passes table.
+ *
+ * Belt and braces to ensure lat lon fields and external_key populated in
+ * ecobat_occurrence_passes table.
+ */
+function ecobat_passes_set_calc_fields($db) {
+  $db->query(<<<QRY
+UPDATE ecobat_occurrence_passes eop SET
+  lon=ST_X(ST_Centroid(ST_Transform(geom, 4326))),
+  lat=ST_Y(ST_Centroid(ST_Transform(geom, 4326))),
+  external_key=cttl.external_key
+FROM cache_taxa_taxon_lists cttl
+WHERE (eop.lon is null or eop.lat is null or eop.external_key is null)
+AND cttl.id=eop.taxa_taxon_list_id;
+QRY
+  );
+}
+
+function rollup_passes_into_occurrences($db) {
+
+
+
+
+
+  // @todo
+  // UPDATE to link via ecobat_occurrence_id
+
+
+
+
+
+
+
+
+  $db->query(<<<QRY
+INSERT INTO ecobat_occurrences (
+  taxa_taxon_list_id,
+  external_key,
+  entered_sref,
+  entered_sref_system,
+  geom,
+  sensitivity,
+  date_start,
+  day_of_year,
+  pass_definition_id,
+  detector_make_id,
+  detector_model,
+  detector_height_m,
+  roost_within_25m,
+  activity_elevated_by_roost,
+  roost_species,
+  linear_feature_adjacent_id,
+  linear_feature_25m_id,
+  anthropogenic_feature_adjacent_id,
+  anthropogenic_feature_25m_id,
+  temperature_c,
+  rainfall_id,
+  wind_speed_mph,
+  group_id,
+  created_by_id,
+  updated_by_id,
+  import_guid,
+  location_name,
+  passes,
+  created_on,
+  updated_on
+)
+SELECT taxa_taxon_list_id,
+  external_key,
+  entered_sref,
+  entered_sref_system,
+  geom,
+  sensitivity,
+  date_start,
+  extract(doy from date_start),
+  pass_definition_id,
+  detector_make_id,
+  detector_model,
+  detector_height_m,
+  roost_within_25m,
+  activity_elevated_by_roost,
+  roost_species,
+  linear_feature_adjacent_id,
+  linear_feature_25m_id,
+  anthropogenic_feature_adjacent_id,
+  anthropogenic_feature_25m_id,
+  temperature_c,
+  rainfall_id,
+  wind_speed_mph,
+  group_id,
+  created_by_id,
+  updated_by_id,
+  import_guid,
+  location_name,
+  count(*) as passes,
+  now(),
+  now()
+FROM ecobat_occurrence_passes
+WHERE processed=false
+GROUP BY taxa_taxon_list_id,
+  external_key,
+  entered_sref,
+  entered_sref_system,
+  geom,
+  sensitivity,
+  date_start,
+  pass_definition_id,
+  detector_make_id,
+  detector_model,
+  detector_height_m,
+  roost_within_25m,
+  activity_elevated_by_roost,
+  roost_species,
+  linear_feature_adjacent_id,
+  linear_feature_25m_id,
+  anthropogenic_feature_adjacent_id,
+  anthropogenic_feature_25m_id,
+  temperature_c,
+  rainfall_id,
+  wind_speed_mph,
+  group_id,
+  created_by_id,
+  updated_by_id,
+  import_guid,
+  location_name;
+
+UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false;
+QRY
+  );
 }
 
 function _ecobat_update_reporting_fields($db) {
@@ -61,6 +194,16 @@ WHERE (eo.easting is null or eo.northing is null or eo.external_key is null)
 AND cttl.id=eo.taxa_taxon_list_id
 QRY
   );
+  $db->query(<<<QRY
+UPDATE ecobat_occurrence_passes eop SET
+  lon=ST_X(ST_Centroid(ST_Transform(geom, 4326))),
+  lat=ST_Y(ST_Centroid(ST_Transform(geom, 4326))),
+  external_key=cttl.external_key
+FROM cache_taxa_taxon_lists cttl
+WHERE (eop.lat is null or eop.lon is null or eop.external_key is null)
+AND cttl.id=eop.taxa_taxon_list_id
+QRY
+  );
 }
 
 function _ecobat_update_map_sq($last_run_date, $db) {
@@ -72,18 +215,19 @@ function _ecobat_update_map_sq($last_run_date, $db) {
   $requiredSquares = $db->query(
     "SELECT DISTINCT id as ecobat_occurrence_id, st_astext(geom) as geom,
           round(st_x(st_centroid(reduce_precision(geom, false, 10000, 'osgb')))) as x,
-          round(st_x(st_centroid(reduce_precision(geom, false, 10000, 'osgb')))) as y
+          round(st_y(st_centroid(reduce_precision(geom, false, 10000, 'osgb')))) as y
         FROM ecobat_occurrences
         WHERE geom is not null and created_on>='$last_run_date' and map_sq_10km_id is null")->result_array(TRUE);
   foreach ($requiredSquares as $s) {
     $existing = $db->query("SELECT id FROM map_squares WHERE x={$s->x} AND y={$s->y} AND size=10000")->result_array(FALSE);
-    if (count($existing)===0) {
-      $qry=$db->query("INSERT INTO map_squares (geom, x, y, size)
+    if (count($existing) === 0) {
+      $qry = $db->query("INSERT INTO map_squares (geom, x, y, size)
             VALUES (reduce_precision(st_geomfromtext('{$s->geom}', $srid), false, 10000, 'osgb'), {$s->x}, {$s->y}, 10000)");
-      $msqId=$qry->insert_id();
+      $msqId = $qry->insert_id();
     }
-    else
-      $msqId=$existing[0]['id'];
+    else {
+      $msqId = $existing[0]['id'];
+    }
     $db->query("UPDATE ecobat_occurrences SET map_sq_10km_id=$msqId WHERE id={$s->ecobat_occurrence_id}");
   }
 }
@@ -94,10 +238,10 @@ function _ecobat_insert_occurrences($db) {
   $passTerms = kohana::config('ecobat.pass_terms');
   // Find up to 2000 occurrences that need to be generated
   $occs = $db->query(<<<SELECT
-SELECT * from ecobat_occurrences 
+SELECT * from ecobat_occurrences
 WHERE occurrence_id IS NULL
-AND autogenerated=FALSE 
-AND sensitivity<3 
+AND autogenerated=FALSE
+AND sensitivity<3
 AND passes IS NOT NULL
 LIMIT 2000
 SELECT
@@ -109,25 +253,25 @@ SELECT
     'entered_sref_system',
     'date_start',
     'group_id',
-    'location_name'
+    'location_name',
   ), array_keys($smpAttrs));
   echo count($occs) . ' ecobat occurrences to process<br/>';
-  foreach($occs as $ecobat_occurrence) {
+  foreach ($occs as $ecobat_occurrence) {
     $thisSampleFields = array_intersect_key($ecobat_occurrence, array_combine($allSampleFields, $allSampleFields));
     $thisSample = implode('|', $thisSampleFields);
-    if ($thisSample!==$lastSample) {
-      // if a new sample, create the sample record
+    if ($thisSample !== $lastSample) {
+      // If a new sample, create the sample record.
       $s = array(
         'website_id' => kohana::config('ecobat.website_id'),
         'survey_id' => kohana::config('ecobat.survey_id'),
-        'date_start'=>$ecobat_occurrence['date_start'],
-        'date_end'=>$ecobat_occurrence['date_start'],
-        'date_type'=>'D',
+        'date_start' => $ecobat_occurrence['date_start'],
+        'date_end' => $ecobat_occurrence['date_start'],
+        'date_type' => 'D',
         'entered_sref' => $ecobat_occurrence['entered_sref'],
         'entered_sref_system' => $ecobat_occurrence['entered_sref_system'],
         'location_name' => $ecobat_occurrence['location_name'],
-        'privacy_precision' => $ecobat_occurrence['sensitivity']===2 ? 10000 : null,
-        'record_status' => 'C'
+        'privacy_precision' => $ecobat_occurrence['sensitivity'] === 2 ? 10000 : null,
+        'record_status' => 'C',
       );
       foreach ($smpAttrs as $ecobatFieldName => $attrId) {
         $s[$attrId] = $ecobat_occurrence[$ecobatFieldName];
@@ -278,7 +422,7 @@ from (
   join cache_taxa_taxon_lists ttl on ttl.id=eo.taxa_taxon_list_id
   join cache_taxa_taxon_lists ttlpref on ttlpref.taxon_meaning_id=ttl.taxon_meaning_id and ttlpref.taxon_list_id=ttl.taxon_list_id and ttlpref.preferred=true
   left join cache_taxa_taxon_lists ttlchild on ttlchild.parent_id=ttl.id and ttlchild.preferred=true
-  left join ecobat_occurrences eochild on 
+  left join ecobat_occurrences eochild on
     eochild.external_key = ttlchild.external_key and
     eochild.easting = eo.easting and
     eochild.northing = eo.northing and
@@ -309,7 +453,7 @@ from (
   join cache_taxa_taxon_lists ttlpref on ttlpref.taxon_meaning_id=ttl.taxon_meaning_id and ttlpref.taxon_list_id=ttl.taxon_list_id and ttlpref.preferred=true
   left join cache_taxa_taxon_lists ttlchild on ttlchild.parent_id=ttl.id and ttlchild.preferred=true
   left join cache_taxa_taxon_lists ttlgrandchild on ttlgrandchild.parent_id=ttlchild.id and ttlgrandchild.preferred=true
-  left join ecobat_occurrences eograndchild on 
+  left join ecobat_occurrences eograndchild on
     eograndchild.external_key = ttlgrandchild.external_key and
     eograndchild.easting = eo.easting and
     eograndchild.northing = eo.northing and
