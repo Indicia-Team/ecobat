@@ -63,8 +63,8 @@ class Ecobat_occurrence_pass_Model extends ORM {
     $array->add_rules('group_id', 'integer');
     $this->unvalidatedFields = array(
       'external_key', 'geom', 'detector_make_other',
-      'detector_model', 'detector_id', 'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
-      'roost_species', 'import_guid', 'processed', 'pass_time',
+      'detector_model', 'detector_identity', 'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
+      'roost_species', 'import_guid', 'processed',
     );
     return parent::validate($array, $save);
   }
@@ -92,7 +92,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
         'population_call' => 'direct:website:id:title',
         'filterIncludesNulls' => TRUE,
       ),
-      'ecobat_occurrence_passes:entered_sref_system' => array(
+      'ecobat_occurrence_pass:entered_sref_system' => array(
         'display' => 'Spatial ref. system',
         'description' => 'Select the spatial reference system used in this import file. Note, if you have a file with a mix of spatial reference systems then you need a ' .
           'column in the import file which is mapped to the Sample Spatial Reference System field containing the spatial reference system code.',
@@ -100,7 +100,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
         'lookup_values' => implode(',', $srefs),
       ),
       // Also allow a field to be defined which defines the taxon list to look in when searching for species during a csv upload
-      'ecobat_occurrence_passes:fkFilter:taxa_taxon_list:taxon_list_id' => array(
+      'ecobat_occurrence_pass:fkFilter:taxa_taxon_list:taxon_list_id' => array(
         'display' => 'Species list',
         'description' => 'Select the species checklist which will be used when attempting to match species names.',
         'datatype' => 'lookup',
@@ -109,13 +109,13 @@ class Ecobat_occurrence_pass_Model extends ORM {
         'linked_filter_field' => 'website_id',
         'filterIncludesNulls' => TRUE,
       ),
-      'ecobat_occurrence_passes:pass_definition_id' => array(
+      'ecobat_occurrence_pass:pass_definition_id' => array(
         'display' => 'Bat pass definition',
         'description' => 'Select the definition used as a criteria for the number of passes.',
         'datatype' => 'lookup',
         'population_call' => 'report:library/terms/terms_list:termlists_term_id:term:termlist_external_key=ecobat:pass_definitions,termlist_id=',
       ),
-      'ecobat_occurrence_passes:sensitivity' => array(
+      'ecobat_occurrence_pass:sensitivity' => array(
         'display' => 'Sensitivity of data',
         'description' => 'Choose the sensitivity settings for the records.',
         'datatype' => 'lookup',

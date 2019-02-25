@@ -15,7 +15,7 @@ CREATE TABLE ecobat_occurrence_passes
   pass_definition_id integer NOT NULL,
   detector_make_id integer NOT NULL,
   detector_model character varying NOT NULL,
-  detector_id character varying NOT NULL,
+  detector_identity character varying NOT NULL,
   detector_height_m numeric(4,2),
   roost_within_25m boolean NOT NULL DEFAULT FALSE,
   activity_elevated_by_roost boolean NOT NULL DEFAULT FALSE,
@@ -91,7 +91,7 @@ COMMENT ON COLUMN ecobat_occurrence_passes.pass_time IS 'Time of the pass.';
 COMMENT ON COLUMN ecobat_occurrence_passes.pass_definition_id IS 'Foreign key to the termlists_terms table. Defines the method used to identify a pass.';
 COMMENT ON COLUMN ecobat_occurrence_passes.detector_make_id IS 'The makeof bat detector used, picked from a controlled list.';
 COMMENT ON COLUMN ecobat_occurrence_passes.detector_model IS 'The model of bat detector used.';
-COMMENT ON COLUMN ecobat_occurrence_passes.detector_id IS 'Identifier of the individual detector.';
+COMMENT ON COLUMN ecobat_occurrence_passes.detector_identity IS 'Identifier of the individual detector.';
 COMMENT ON COLUMN ecobat_occurrence_passes.detector_height_m IS 'Height of the detector from the ground in metres.';
 COMMENT ON COLUMN ecobat_occurrence_passes.roost_within_25m IS 'Presence or absence of a roost within 25m.';
 COMMENT ON COLUMN ecobat_occurrence_passes.activity_elevated_by_roost IS 'Flag set if activity was elevated because of the presence of a roost.';

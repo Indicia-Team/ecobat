@@ -19,7 +19,7 @@
     <column name="id" display="ID" sql="eop.id" datatype="integer"/>
     <column name="species" display="Species" sql="cttl.preferred_taxon" datatype="text"/>
     <column name="number_of_bats" display="Number of bats" sql="eop.number_of_bats" datatype="integer"/>
-    <column name="detector_id" display="Detector ID" sql="eop.detector_id" datatype="text"/>
+    <column name="detector_identity" display="Detector ID" sql="eop.detector_identity" datatype="text"/>
     <column name="date" display="Date" sql="eop.date_start" datatype="date"/>
     <column name="time" display="Time" sql="eop.time" datatype="text"/>
     <column name="lat" display="Latitude" sql="eop.time" datatype="float"/>
