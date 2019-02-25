@@ -130,8 +130,8 @@ SELECT taxa_taxon_list_id,
   created_by_id,
   updated_by_id,
   import_guid,
-  location_name,
-  count(*) as passes,
+  detector_id as location_name,
+  sum(number_of_bats) as passes,
   now(),
   now()
 FROM ecobat_occurrence_passes
@@ -146,6 +146,7 @@ GROUP BY taxa_taxon_list_id,
   pass_definition_id,
   detector_make_id,
   detector_model,
+  detector_id,
   detector_height_m,
   roost_within_25m,
   activity_elevated_by_roost,
@@ -160,8 +161,7 @@ GROUP BY taxa_taxon_list_id,
   group_id,
   created_by_id,
   updated_by_id,
-  import_guid,
-  location_name;
+  import_guid;
 
 UPDATE ecobat_occurrence_passes eop
 SET ecobat_occurrence_id=eo.id
@@ -190,7 +190,6 @@ AND eop.created_by_id=eo.created_by_id
 AND COALESCE(eop.import_guid, '')=COALESCE(eo.import_guid, '')
 AND COALESCE(eop.location_name, '')=COALESCE(eo.location_name, '')
 AND eop.ecobat_occurrence_id IS NULL;
-
 
 UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false;
 QRY
