@@ -21,10 +21,8 @@
     <column name="number_of_bats" display="Number of bats" sql="eop.number_of_bats" datatype="integer"/>
     <column name="detector_identity" display="Detector ID" sql="eop.detector_identity" datatype="text"/>
     <column name="date" display="Date" sql="eop.date_start" datatype="date"/>
-    <column name="time" display="Time" sql="eop.time" datatype="text"/>
-    <column name="lat" display="Latitude" sql="eop.time" datatype="float"/>
-    <column name="lon" display="Longitude" sql="eop.time" datatype="float"/>
-    <column name="import_unique_id" display="Import unique ID" sql="eop.import_guid" datatype="text"/>
+    <column name="time" display="Time" sql="eop.pass_time" datatype="text"/>
+    <column name="lat" display="Latitude" sql="eop.lat" datatype="float"/>
+    <column name="lon" display="Longitude" sql="eop.lon" datatype="float"/>
   </columns>
 </report>
-
