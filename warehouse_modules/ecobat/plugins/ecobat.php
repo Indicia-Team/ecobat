@@ -178,6 +178,35 @@ GROUP BY taxa_taxon_list_id,
   import_guid,
   location_name;
 
+UPDATE ecobat_occurrence_passes eop
+SET ecobat_occurrence_id=eo.id
+FROM ecobat_occurrences eo
+WHERE eop.taxa_taxon_list_id=eo.taxa_taxon_list_id
+AND eop.entered_sref=eo.entered_sref
+AND eop.entered_sref_system=eo.entered_sref_system
+AND eop.sensitivity=eo.sensitivity
+AND eop.date_start=eo.date_start
+AND eop.pass_definition_id=eo.pass_definition_id
+AND eop.detector_make_id=eo.detector_make_id
+AND eop.detector_model=eo.detector_model
+AND COALESCE(eop.detector_height_m, 0)=COALESCE(eo.detector_height_m, 0)
+AND eop.roost_within_25m=eo.roost_within_25m
+AND eop.activity_elevated_by_roost=eo.activity_elevated_by_roost
+AND COALESCE(eop.roost_species, '')=COALESCE(eo.roost_species, '')
+AND COALESCE(eop.linear_feature_adjacent_id, 0)=COALESCE(eo.linear_feature_adjacent_id, 0)
+AND COALESCE(eop.linear_feature_25m_id, 0)=COALESCE(eo.linear_feature_25m_id, 0)
+AND COALESCE(eop.anthropogenic_feature_adjacent_id, 0)=COALESCE(eo.anthropogenic_feature_adjacent_id, 0)
+AND COALESCE(eop.anthropogenic_feature_25m_id, 0)=COALESCE(eo.anthropogenic_feature_25m_id, 0)
+AND COALESCE(eop.temperature_c, 0)=COALESCE(eo.temperature_c, 0)
+AND COALESCE(eop.rainfall_id, 0)=COALESCE(eo.rainfall_id, 0)
+AND COALESCE(eop.wind_speed_mph, 0)=COALESCE(eo.wind_speed_mph, 0)
+AND COALESCE(eop.group_id, 0)=COALESCE(eo.group_id, 0)
+AND eop.created_by_id=eo.created_by_id
+AND COALESCE(eop.import_guid, '')=COALESCE(eo.import_guid, '')
+AND COALESCE(eop.location_name, '')=COALESCE(eo.location_name, '')
+AND eop.ecobat_occurrence_id IS NULL;
+
+
 UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false;
 QRY
   );
