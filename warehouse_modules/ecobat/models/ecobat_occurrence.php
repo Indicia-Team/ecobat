@@ -34,13 +34,13 @@ class Ecobat_occurrence_Model extends ORM {
   protected $belongs_to=array
   (
     'taxa_taxon_list',
-    'pass_definition'=>'termlists_term',
-    'detector_make'=>'termlists_term',
-    'linear_feature_adjacent'=>'termlists_term',
-    'linear_feature_25m'=>'termlists_term',
-    'anthropogenic_feature_adjacent'=>'termlists_term',
-    'anthropogenic_feature_25m'=>'termlists_term',
-    'rainfall'=>'termlists_term',
+    'pass_definition' => 'termlists_term',
+    'detector_make' => 'termlists_term',
+    'linear_feature_adjacent' => 'termlists_term',
+    'linear_feature_25m' => 'termlists_term',
+    'anthropogenic_feature_adjacent' => 'termlists_term',
+    'anthropogenic_feature_25m' => 'termlists_term',
+    'rainfall' => 'termlists_term',
     'group'
   );
 
@@ -151,7 +151,6 @@ class Ecobat_occurrence_Model extends ORM {
    * can work out the geom and fill it in.
    */
   private function preSubmitFillInGeom() {
-    //
     if (array_key_exists('entered_sref', $this->submission['fields']) &&
         array_key_exists('entered_sref_system', $this->submission['fields']) &&
         !(array_key_exists('geom', $this->submission['fields']) && $this->submission['fields']['geom']['value']) &&
@@ -162,7 +161,8 @@ class Ecobat_occurrence_Model extends ORM {
           $this->submission['fields']['entered_sref']['value'],
           $this->submission['fields']['entered_sref_system']['value']
         );
-      } catch (Exception $e) {
+      }
+      catch (Exception $e) {
         throw new Exception('The grid reference or lat long point provided was invalid: ' . $this->submission['fields']['entered_sref']['value']);
       }
     }
