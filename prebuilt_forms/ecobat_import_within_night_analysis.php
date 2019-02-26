@@ -52,7 +52,7 @@ class iform_ecobat_import_within_night_analysis {
       'input_import_guid' => $_REQUEST['import_guid'],
     );
     if (!empty($_POST['shiny'])) {
-      $url = 'https://ecobat.shinyapps.io/ecobat_within_night_analysis?' . http_build_query($params);
+      $url = 'https://ecobat.shinyapps.io/Nightly-Analysis?' . http_build_query($params);
       header('Location: ' . $url);
       die();
     }
