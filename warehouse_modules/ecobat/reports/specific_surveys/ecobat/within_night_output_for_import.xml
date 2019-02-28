@@ -7,13 +7,14 @@
     from ecobat_occurrence_passes eop
     join cache_taxa_taxon_lists cttl on cttl.id=eop.taxa_taxon_list_id
     #joins#
-    where 1=1
+    where eop.import_guid='#input_import_guid#'
     #filters#
   </query>
   <order_bys>
     <order_by>eop.id</order_by>
   </order_bys>
   <params>
+    <param name="input_import_guid" display="Import unique ID" datatype="text" />
   </params>
   <columns>
     <column name="id" display="ID" sql="eop.id" datatype="integer"/>
