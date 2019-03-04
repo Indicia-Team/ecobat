@@ -3,7 +3,7 @@
     description="Gets the range of parameters for an import, e.g. the min and max wind speed or temperature to feed into an import."
     >
   <query>
-    select min(extract(doy from date_start)-1) as doy_from, max(extract(doy from date_start)-1) as doy_to,
+    select min(extract(doy from date_start)) as doy_from, max(extract(doy from date_start)) as doy_to,
     avg(st_x(st_centroid(st_transform(geom, 27700)))) as x_avg, avg(st_y(st_centroid(st_transform(geom, 27700)))) as y_avg,
     min(temperature_c) as temperature_c_low, max(temperature_c) as temperature_c_high,
     min(wind_speed_mph) as wind_speed_mph_low, max(wind_speed_mph) as wind_speed_mph_high,
@@ -11,6 +11,7 @@
     string_agg(distinct pass_definition_id::varchar, ',') as pass_definition_ids
     from ecobat_occurrences
     where import_guid='#input_import_guid#'
+
   </query>
   <params>
     <param name="input_import_guid" display="Import unique ID" datatype="text" />

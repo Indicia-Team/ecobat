@@ -19,6 +19,7 @@
       ) as o
     ) as fullset
     where fullset.id=-1
+	and 88 in (#website_ids#) -- ensure permissions OK
   </query>
   <order_bys>
     <order_by>fullset.date_start</order_by>
