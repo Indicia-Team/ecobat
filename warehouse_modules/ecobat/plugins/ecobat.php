@@ -59,12 +59,10 @@ function ecobat_scheduled_task($last_run_date, $db) {
  */
 function ecobat_passes_set_calc_fields($db) {
   $db->query(<<<QRY
-UPDATE ecobat_occurrence_passes eop SET
-  lon=ST_X(ST_Centroid(ST_Transform(geom, 4326))),
-  lat=ST_Y(ST_Centroid(ST_Transform(geom, 4326))),
-  external_key=cttl.external_key
+UPDATE ecobat_occurrence_passes eop
+  SET external_key=cttl.external_key
 FROM cache_taxa_taxon_lists cttl
-WHERE (eop.lon is null or eop.lat is null or eop.external_key is null)
+WHERE eop.external_key is null
 AND cttl.id=eop.taxa_taxon_list_id;
 QRY
   );
@@ -100,15 +98,17 @@ INSERT INTO ecobat_occurrences (
   updated_by_id,
   import_guid,
   location_name,
+  method_of_classification,
+  analysis_software_used,
   passes,
   created_on,
   updated_on
 )
 SELECT taxa_taxon_list_id,
   external_key,
-  entered_sref,
-  entered_sref_system,
-  geom,
+  abs(lat) || CASE WHEN lat>=0 THEN 'N' ELSE 'S' END || ' ' || abs(lon) || CASE WHEN lon>=0 THEN 'E' ELSE 'W' END,
+  4326,
+  st_transform(st_geomfromtext('POINT(' || lon || ' ' || lat || ')', 4326), 900913),
   sensitivity,
   date_start,
   extract(doy from date_start),
@@ -131,6 +131,8 @@ SELECT taxa_taxon_list_id,
   updated_by_id,
   import_guid,
   detector_identity as location_name,
+  method_of_classification,
+  analysis_software_used,
   sum(number_of_bats) as passes,
   now(),
   now()
@@ -138,9 +140,8 @@ FROM ecobat_occurrence_passes
 WHERE processed=false
 GROUP BY taxa_taxon_list_id,
   external_key,
-  entered_sref,
-  entered_sref_system,
-  geom,
+  lat,
+  lon,
   sensitivity,
   date_start,
   pass_definition_id,
@@ -161,14 +162,16 @@ GROUP BY taxa_taxon_list_id,
   group_id,
   created_by_id,
   updated_by_id,
-  import_guid;
+  import_guid,
+  detector_identity,
+  method_of_classification,
+  analysis_software_used;
 
 UPDATE ecobat_occurrence_passes eop
 SET ecobat_occurrence_id=eo.id
 FROM ecobat_occurrences eo
 WHERE eop.taxa_taxon_list_id=eo.taxa_taxon_list_id
-AND eop.entered_sref=eo.entered_sref
-AND eop.entered_sref_system=eo.entered_sref_system
+AND abs(eop.lat) || CASE WHEN eop.lat>=0 THEN 'N' ELSE 'S' END || ' ' || abs(eop.lon) || CASE WHEN eop.lon>=0 THEN 'E' ELSE 'W' END = eo.entered_sref
 AND eop.sensitivity=eo.sensitivity
 AND eop.date_start=eo.date_start
 AND eop.pass_definition_id=eo.pass_definition_id
@@ -189,9 +192,11 @@ AND COALESCE(eop.wind_speed_mph, 0)=COALESCE(eo.wind_speed_mph, 0)
 AND COALESCE(eop.group_id, 0)=COALESCE(eo.group_id, 0)
 AND eop.created_by_id=eo.created_by_id
 AND COALESCE(eop.import_guid, '')=COALESCE(eo.import_guid, '')
+AND COALESCE(eop.detector_identity, '')=COALESCE(eo.location_name, '')
+AND COALESCE(eop.method_of_classification, '')=COALESCE(eo.method_of_classification, '')
 AND eop.ecobat_occurrence_id IS NULL;
 
-UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false;
+UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false and ecobat_occurrence_id is not null;
 QRY
   );
 }
@@ -205,16 +210,6 @@ UPDATE ecobat_occurrences eo SET
 FROM cache_taxa_taxon_lists cttl
 WHERE (eo.easting is null or eo.northing is null or eo.external_key is null)
 AND cttl.id=eo.taxa_taxon_list_id
-QRY
-  );
-  $db->query(<<<QRY
-UPDATE ecobat_occurrence_passes eop SET
-  lon=ST_X(ST_Centroid(ST_Transform(geom, 4326))),
-  lat=ST_Y(ST_Centroid(ST_Transform(geom, 4326))),
-  external_key=cttl.external_key
-FROM cache_taxa_taxon_lists cttl
-WHERE (eop.lat is null or eop.lon is null or eop.external_key is null)
-AND cttl.id=eop.taxa_taxon_list_id
 QRY
   );
 }

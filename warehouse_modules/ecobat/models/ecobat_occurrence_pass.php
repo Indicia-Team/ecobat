@@ -42,10 +42,8 @@ class Ecobat_occurrence_pass_Model extends ORM {
 
     // Required fields.
     $array->add_rules('taxa_taxon_list_id', 'required');
-    $array->add_rules('entered_sref', 'required');
-    $array->add_rules('entered_sref_system', 'required');
-    $array->add_rules('lat', 'numeric');
-    $array->add_rules('lon', 'numeric');
+    $array->add_rules('lat', 'numeric', 'required');
+    $array->add_rules('lon', 'numeric', 'required');
     $array->add_rules('sensitivity', 'integer', 'required');
     $array->add_rules('date_start', 'date', 'required');
     $array->add_rules('pass_time', 'required');
@@ -64,9 +62,10 @@ class Ecobat_occurrence_pass_Model extends ORM {
     $array->add_rules('ecobat_occurrence_id', 'integer');
     $array->add_rules('group_id', 'integer');
     $this->unvalidatedFields = array(
-      'external_key', 'geom', 'detector_make_other',
+      'external_key', 'detector_make_other',
       'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
-      'roost_species', 'import_guid', 'processed',
+      'roost_species', 'import_guid', 'processed', 'method_of_classification',
+      'analysis_software_used',
     );
     return parent::validate($array, $save);
   }
@@ -93,14 +92,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
         'datatype' => 'lookup',
         'population_call' => 'direct:website:id:title',
         'filterIncludesNulls' => TRUE,
-      ),
-      'ecobat_occurrence_pass:entered_sref_system' => array(
-        'display' => 'Spatial ref. system',
-        'description' => 'Select the spatial reference system used in this import file. Note, if you have a file with a mix of spatial reference systems then you need a ' .
-          'column in the import file which is mapped to the Sample Spatial Reference System field containing the spatial reference system code.',
-        'datatype' => 'lookup',
-        'lookup_values' => implode(',', $srefs),
-      ),
+      ),      
       // Also allow a field to be defined which defines the taxon list to look in when searching for species during a csv upload
       'ecobat_occurrence_pass:fkFilter:taxa_taxon_list:taxon_list_id' => array(
         'display' => 'Species list',
@@ -133,33 +125,9 @@ class Ecobat_occurrence_pass_Model extends ORM {
    * * fill in the geom field using the supplied spatial reference, if not already filled in
    * * fill in the day of year which is used for quick date filtering
    */
-  protected function preSubmit()
-  {
-    $this->preSubmitFillInGeom();
+  protected function preSubmit() {
     $this->preSubmitFillInSensitivity();
     return parent::presubmit();
-  }
-
-  /**
-   * Allow an ecobat occurrence to be submitted with a spatial ref and system but no Geom. If so we
-   * can work out the geom and fill it in.
-   */
-  private function preSubmitFillInGeom() {
-    if (array_key_exists('entered_sref', $this->submission['fields']) &&
-        array_key_exists('entered_sref_system', $this->submission['fields']) &&
-        !(array_key_exists('geom', $this->submission['fields']) && $this->submission['fields']['geom']['value']) &&
-        $this->submission['fields']['entered_sref']['value'] &&
-        $this->submission['fields']['entered_sref_system']['value']) {
-      try {
-        $this->submission['fields']['geom']['value'] = spatial_ref::sref_to_internal_wkt(
-          $this->submission['fields']['entered_sref']['value'],
-          $this->submission['fields']['entered_sref_system']['value']
-        );
-      }
-      catch (Exception $e) {
-        throw new Exception('The grid reference or lat long point provided was invalid: ' . $this->submission['fields']['entered_sref']['value']);
-      }
-    }
   }
 
   private function preSubmitFillInSensitivity() {
@@ -170,38 +138,6 @@ class Ecobat_occurrence_pass_Model extends ORM {
       $this->submission['fields']['sensitivity']['value'] =
         $mappings[strtolower(str_replace(' ', '', $this->submission['fields']['sensitivity']['value']))];
     }
-  }
-
-  /**
-   * Override set handler to translate WKT to PostGIS internal spatial data.
-   * Also sets the lat and lon.
-   */
-  public function __set($key, $value) {
-    if ($key === 'geom') {
-      if ($value) {
-        $geom = "ST_GeomFromText('$value', " . kohana::config('sref_notations.internal_srid') . ")";
-        $row = $this->db->query("SELECT $geom AS geom, " .
-            "ST_X(ST_Centroid(ST_Transform($geom, 4326))) as lon, " .
-            "ST_Y(ST_Centroid(ST_Transform($geom, 4326))) as lat")->current();
-        $value = $row->geom;
-        parent::__set('lon', $row->lon);
-        parent::__set('lat', $row->lat);
-      }
-    }
-    parent::__set($key, $value);
-  }
-
-  /**
-   * Override get handler to translate PostGIS internal spatial data to WKT.
-   */
-  public function __get($column) {
-    $value = parent::__get($column);
-
-    if (substr($column, -4) == 'geom' && $value !== NULL) {
-      $row = $this->db->query("SELECT ST_asText('$value') AS wkt")->current();
-      $value = $row->wkt;
-    }
-    return $value;
   }
 
 }
