@@ -194,6 +194,7 @@ AND eop.created_by_id=eo.created_by_id
 AND COALESCE(eop.import_guid, '')=COALESCE(eo.import_guid, '')
 AND COALESCE(eop.detector_identity, '')=COALESCE(eo.location_name, '')
 AND COALESCE(eop.method_of_classification, '')=COALESCE(eo.method_of_classification, '')
+AND COALESCE(eop.analysis_software_used, '')=COALESCE(eo.analysis_software_used, '')
 AND eop.ecobat_occurrence_id IS NULL;
 
 UPDATE ecobat_occurrence_passes SET processed=true WHERE processed=false and ecobat_occurrence_id is not null;
