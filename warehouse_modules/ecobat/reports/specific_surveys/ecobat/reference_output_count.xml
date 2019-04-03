@@ -1,5 +1,5 @@
 <report
-    title="Reference output count for range"
+    title="Reference output count"
     description="Provides a count of the records included in a reference range filter"
     >
   <query>

@@ -1,5 +1,5 @@
 <report
-    title="Reference output basic"
+    title="Reference output for manually specified record"
     description="Basic output of a reference range calculation for a manually specified bat detector record nights."
     >
   <query>

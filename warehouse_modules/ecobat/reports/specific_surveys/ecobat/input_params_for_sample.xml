@@ -1,6 +1,6 @@
 <report
-    title="Input params for import"
-    description="Gets the range of parameters for an import, e.g. the min and max wind speed or temperature to feed into an import."
+    title="Input params for sample"
+    description="Gets the range of parameters for a sample, e.g. the min and max wind speed or temperature to feed into an analysis."
     >
   <query>
     select min(extract(doy from date_start)) as doy_from, max(extract(doy from date_start)) as doy_to,
