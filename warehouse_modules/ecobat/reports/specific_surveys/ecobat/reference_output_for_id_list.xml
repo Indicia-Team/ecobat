@@ -14,8 +14,8 @@
     ) as fullset
     join cache_taxa_taxon_lists cttl on cttl.id=fullset.taxa_taxon_list_id
     where id in (#input_id_list#)
-	and 88 in (#website_ids#) -- ensure permissions OK
-  </query>  
+      and 88 in (#website_ids#) -- ensure permissions OK
+  </query>
   <order_bys>
     <order_by>o.date_start</order_by>
   </order_bys>

@@ -11,7 +11,6 @@
     string_agg(distinct pass_definition_id::varchar, ',') as pass_definition_ids
     from ecobat_occurrences
     where import_guid='#input_import_guid#'
-
   </query>
   <params>
     <param name="input_import_guid" display="Import unique ID" datatype="text" />
