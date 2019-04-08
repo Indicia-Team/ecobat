@@ -65,7 +65,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
       'external_key', 'detector_make_other',
       'detector_height_m', 'roost_within_25m', 'activity_elevated_by_roost',
       'roost_species', 'import_guid', 'processed', 'method_of_classification',
-      'analysis_software_used',
+      'analysis_software_used', 'site_name',
     );
     return parent::validate($array, $save);
   }

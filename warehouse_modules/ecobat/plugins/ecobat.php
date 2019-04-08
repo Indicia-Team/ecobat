@@ -100,6 +100,7 @@ INSERT INTO ecobat_occurrences (
   location_name,
   method_of_classification,
   analysis_software_used,
+  site_name,
   passes,
   created_on,
   updated_on
@@ -133,6 +134,7 @@ SELECT taxa_taxon_list_id,
   detector_identity as location_name,
   method_of_classification,
   analysis_software_used,
+  site_name,
   sum(number_of_bats) as passes,
   now(),
   now()
@@ -165,7 +167,8 @@ GROUP BY taxa_taxon_list_id,
   import_guid,
   detector_identity,
   method_of_classification,
-  analysis_software_used;
+  analysis_software_used,
+  site_name;
 
 UPDATE ecobat_occurrence_passes eop
 SET ecobat_occurrence_id=eo.id
@@ -194,6 +197,7 @@ AND eop.created_by_id=eo.created_by_id
 AND COALESCE(eop.import_guid, '')=COALESCE(eo.import_guid, '')
 AND COALESCE(eop.detector_identity, '')=COALESCE(eo.location_name, '')
 AND COALESCE(eop.method_of_classification, '')=COALESCE(eo.method_of_classification, '')
+AND COALESCE(eop.site_name, '')=COALESCE(eo.site_name, '')
 AND COALESCE(eop.analysis_software_used, '')=COALESCE(eo.analysis_software_used, '')
 AND eop.ecobat_occurrence_id IS NULL;
 
