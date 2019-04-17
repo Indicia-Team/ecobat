@@ -42,8 +42,8 @@ class Ecobat_occurrence_pass_Model extends ORM {
 
     // Required fields.
     $array->add_rules('taxa_taxon_list_id', 'required');
-    $array->add_rules('lat', 'numeric', 'required');
-    $array->add_rules('lon', 'numeric', 'required');
+    $array->add_rules('lat', 'numeric', 'required', 'maximum[90]', 'minumum[-90]');
+    $array->add_rules('lon', 'numeric', 'required', 'maximum[180]', 'minumum[-180]');
     $array->add_rules('sensitivity', 'integer', 'required');
     $array->add_rules('date_start', 'date', 'required');
     $array->add_rules('pass_time', 'required');
@@ -92,7 +92,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
         'datatype' => 'lookup',
         'population_call' => 'direct:website:id:title',
         'filterIncludesNulls' => TRUE,
-      ),      
+      ),
       // Also allow a field to be defined which defines the taxon list to look in when searching for species during a csv upload
       'ecobat_occurrence_pass:fkFilter:taxa_taxon_list:taxon_list_id' => array(
         'display' => 'Species list',
