@@ -140,6 +140,8 @@ SELECT taxa_taxon_list_id,
   now()
 FROM ecobat_occurrence_passes
 WHERE processed=false
+AND lat BETWEEN -90 AND 90
+AND lon BETWEEN -180 AND 180
 GROUP BY taxa_taxon_list_id,
   external_key,
   lat,
