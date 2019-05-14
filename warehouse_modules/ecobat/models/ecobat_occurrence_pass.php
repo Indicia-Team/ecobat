@@ -42,8 +42,8 @@ class Ecobat_occurrence_pass_Model extends ORM {
 
     // Required fields.
     $array->add_rules('taxa_taxon_list_id', 'required');
-    $array->add_rules('lat', 'numeric', 'required', 'maximum[90]', 'minumum[-90]');
-    $array->add_rules('lon', 'numeric', 'required', 'maximum[180]', 'minumum[-180]');
+    $array->add_rules('lat', 'numeric', 'required', 'maximum[90]', 'minimum[-90]');
+    $array->add_rules('lon', 'numeric', 'required', 'maximum[180]', 'minimum[-180]');
     $array->add_rules('sensitivity', 'integer', 'required');
     $array->add_rules('date_start', 'date', 'required');
     $array->add_rules('pass_time', 'required');
