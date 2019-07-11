@@ -55,7 +55,7 @@ class Ecobat_occurrence_Model extends ORM {
     $array->add_rules('northing', 'integer');
     $array->add_rules('map_sq_10km_id', 'integer');
     $array->add_rules('sensitivity', 'integer', 'required');
-    $array->add_rules('date_start', 'date', 'required');
+    $array->add_rules('date_start', 'required');
     $array->add_rules('day_of_year', 'integer');
     $array->add_rules('passes', 'integer', 'required');
     $array->add_rules('passes_summed', 'integer');

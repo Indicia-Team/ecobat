@@ -45,7 +45,7 @@ class Ecobat_occurrence_pass_Model extends ORM {
     $array->add_rules('lat', 'numeric', 'required', 'maximum[90]', 'minimum[-90]');
     $array->add_rules('lon', 'numeric', 'required', 'maximum[180]', 'minimum[-180]');
     $array->add_rules('sensitivity', 'integer', 'required');
-    $array->add_rules('date_start', 'date', 'required');
+    $array->add_rules('date_start', 'required');
     $array->add_rules('pass_time', 'required');
     $array->add_rules('number_of_bats', 'integer', 'required');
     $array->add_rules('pass_definition_id', 'integer', 'required');
