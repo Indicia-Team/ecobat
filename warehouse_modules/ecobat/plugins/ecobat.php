@@ -111,8 +111,8 @@ SELECT taxa_taxon_list_id,
   4326,
   st_transform(st_geomfromtext('POINT(' || lon || ' ' || lat || ')', 4326), 900913),
   sensitivity,
-  date_start,
-  extract(doy from date_start),
+  (date_start + pass_time - '12 hours'::interval)::date,
+  extract(doy from (date_start + pass_time - '12 hours'::interval)::date),
   pass_definition_id,
   detector_make_id,
   detector_model,
@@ -142,12 +142,13 @@ FROM ecobat_occurrence_passes
 WHERE processed=false
 AND lat BETWEEN -90 AND 90
 AND lon BETWEEN -180 AND 180
+AND import_guid NOT IN (select distinct import_guid from ecobat_occurrence_passes where created_on>now() - '5 minutes'::interval)
 GROUP BY taxa_taxon_list_id,
   external_key,
   lat,
   lon,
   sensitivity,
-  date_start,
+  (date_start + pass_time - '12 hours'::interval)::date,
   pass_definition_id,
   detector_make_id,
   detector_model,
@@ -178,7 +179,7 @@ FROM ecobat_occurrences eo
 WHERE eop.taxa_taxon_list_id=eo.taxa_taxon_list_id
 AND abs(eop.lat) || CASE WHEN eop.lat>=0 THEN 'N' ELSE 'S' END || ' ' || abs(eop.lon) || CASE WHEN eop.lon>=0 THEN 'E' ELSE 'W' END = eo.entered_sref
 AND eop.sensitivity=eo.sensitivity
-AND eop.date_start=eo.date_start
+AND (eop.date_start + eop.pass_time - '12 hours'::interval)::date=eo.date_start
 AND eop.pass_definition_id=eo.pass_definition_id
 AND eop.detector_make_id=eo.detector_make_id
 AND eop.detector_model=eo.detector_model
@@ -229,15 +230,15 @@ function _ecobat_update_map_sq($last_run_date, $db) {
   // Seems much faster to break this into small queries than one big left join.
   $requiredSquares = $db->query(
     "SELECT DISTINCT id as ecobat_occurrence_id, st_astext(geom) as geom,
-          round(st_x(st_centroid(reduce_precision(geom, false, 10000, 'osgb')))) as x,
-          round(st_y(st_centroid(reduce_precision(geom, false, 10000, 'osgb')))) as y
+          round(st_x(st_centroid(reduce_precision(geom, false, 10000)))) as x,
+          round(st_y(st_centroid(reduce_precision(geom, false, 10000)))) as y
         FROM ecobat_occurrences
         WHERE geom is not null and created_on>='$last_run_date' and map_sq_10km_id is null")->result_array(TRUE);
   foreach ($requiredSquares as $s) {
     $existing = $db->query("SELECT id FROM map_squares WHERE x={$s->x} AND y={$s->y} AND size=10000")->result_array(FALSE);
     if (count($existing) === 0) {
       $qry = $db->query("INSERT INTO map_squares (geom, x, y, size)
-            VALUES (reduce_precision(st_geomfromtext('{$s->geom}', $srid), false, 10000, 'osgb'), {$s->x}, {$s->y}, 10000)");
+            VALUES (reduce_precision(st_geomfromtext('{$s->geom}', $srid), false, 10000), {$s->x}, {$s->y}, 10000)");
       $msqId = $qry->insert_id();
     }
     else {
